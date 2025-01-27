@@ -26,11 +26,15 @@ const SignupPage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    const trimmedEmail = email.trim();
+    const trimmedPassword = password.trim();
+  
     const newForm = new FormData();
     newForm.append("file", avatar);
     newForm.append("name", name);
-    newForm.append("email", email);
-    newForm.append("password", password);
+    newForm.append("email", trimmedEmail); // Use trimmed email
+    newForm.append("password", trimmedPassword); // Use trimmed password
+  
     const config = {
       headers: {
         "Content-Type": "multipart/form-data",

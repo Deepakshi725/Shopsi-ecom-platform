@@ -6,19 +6,53 @@ import { Link } from "react-router-dom";
 
 import axios from "axios";
 
-const Login = () => {
+// const Login = () => {
+//   const [email, setEmail] = useState("");
+//   const [password, setPassword] = useState("");
+//   const [visible, setVisible] = useState(false);
+  
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-      axios.post("http://localhost:8000/api/v2/user/login", { email, password }).then((res)=>{
-      console.log(res.data);
-    }).catch ((error)=> { 
-      console.error("There was an error logging in!", error);
-    });
-  };
+//   const handleSubmit = (e) => {
+//     e.preventDefault();
+//       axios.post("http://localhost:8000/api/v2/user/login", { email, password }).then((res)=>{
+//       console.log(res.data);
+//     }).catch ((error)=> { 
+//       console.error("There was an error logging in!", error);
+//     });
+//   };
+ 
+
+const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [visible, setVisible] = useState(false);
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    
+
+  // Remove leading/trailing whitespace from email and password
+  const trimmedEmail = email.trim();
+  const trimmedPassword = password.trim();
+
+  // Log the trimmed values (for debugging)
+  console.log("Email: ", trimmedEmail);
+  console.log("Password: ", trimmedPassword);
+
+  try {
+    // Send signup request with trimmed email and password
+    const response = await axios.post("http://localhost:8000/api/v2/user/login-user", {
+      email: trimmedEmail,
+      password: trimmedPassword,
+    });
+
+    // Handle successful signup response
+    console.log(response.data);
+  } catch (error) {
+    console.error("There was an error logging in!", error);
+  }
+  };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-12 flex flex-col justify-center sm:px-6 lg:px-8">
