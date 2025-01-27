@@ -1,77 +1,163 @@
-import { useState } from 'react';
+//eslint-disable-next-line
+import { React, useState } from "react";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+import styles from "../styles/style";
+import { Link } from "react-router-dom";
 
-function LoginPage() {
-  const [credentials, setCreds] = useState({
-    email: '',
-    password: '',
-  });
+import axios from "axios";
 
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    setCreds({
-      ...credentials,
-      [name]: value,
+// const Login = () => {
+//   const [email, setEmail] = useState("");
+//   const [password, setPassword] = useState("");
+//   const [visible, setVisible] = useState(false);
+  
+
+//   const handleSubmit = (e) => {
+//     e.preventDefault();
+//       axios.post("http://localhost:8000/api/v2/user/login", { email, password }).then((res)=>{
+//       console.log(res.data);
+//     }).catch ((error)=> { 
+//       console.error("There was an error logging in!", error);
+//     });
+//   };
+ 
+
+const Login = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [visible, setVisible] = useState(false);
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    
+
+  // Remove leading/trailing whitespace from email and password
+  const trimmedEmail = email.trim();
+  const trimmedPassword = password.trim();
+
+  // Log the trimmed values (for debugging)
+  console.log("Email: ", trimmedEmail);
+  console.log("Password: ", trimmedPassword);
+
+  try {
+    // Send signup request with trimmed email and password
+    const response = await axios.post("http://localhost:8000/api/v2/user/login-user", {
+      email: trimmedEmail,
+      password: trimmedPassword,
     });
+
+    // Handle successful signup response
+    console.log(response.data);
+  } catch (error) {
+    console.error("There was an error logging in!", error);
+  }
   };
 
-  const handleClickLogin = (event) => {
-    event.preventDefault(); // Prevent form submission and page reload
-    // Add axios request to backend here
-  };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-12">
-      <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-xl shadow-lg">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold text-gray-800">Sign in to your account</h2>
-        </div>
-        <form className="space-y-6" onSubmit={handleClickLogin}>
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              Email address
-            </label>
-            <input
-              type="email"
-              name="email"
-              id="email"
-              autoComplete="email"
-              required
-              value={credentials.email}
-              onChange={handleChange}
-              className="w-full mt-2 px-4 py-3 border rounded-lg shadow-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-              Password
-            </label>
-            <input
-              type="password"
-              name="password"
-              id="password"
-              autoComplete="current-password"
-              required
-              value={credentials.password}
-              onChange={handleChange}
-              className="w-full mt-2 px-4 py-3 border rounded-lg shadow-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-            />
-            <div className="mt-2 text-sm">
-              <a href="#" className="text-purple-600 hover:text-purple-500">
-                Forgot password?
-              </a>
+    <div className="min-h-screen bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-12 flex flex-col justify-center sm:px-6 lg:px-8">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
+          Login to your account
+        </h2>
+      </div>
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            <div>
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Email address
+              </label>
+              <div className="mt-1">
+                <input type="email"
+                  name="email"
+                  autoComplete="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                />
+              </div>
             </div>
-          </div>
-          <button
-            type="submit"
-            className="w-full py-3 bg-purple-600 text-white font-semibold rounded-lg shadow-md hover:bg-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
-          >
-            Sign in
-          </button>
-        </form>
+
+            <div>
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Password
+              </label>
+              <div className="mt-1 relative">
+                <input   type={visible ? "text" : "password"}
+                  name="password"
+                  autoComplete="current-password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                />
+                  {visible ? (
+                  <AiOutlineEye
+                    className="absolute right-2 top-2 cursor-pointer"
+                    size={25}
+                    onClick={() => setVisible(false)}
+                  />
+                ) : (
+                  <AiOutlineEyeInvisible
+                    className="absolute right-2 top-2 cursor-pointer"
+                    size={25}
+                    onClick={() => setVisible(true)}
+                  />
+                )}
+              </div>
+            </div>
+            <div className={`${styles.noramlFlex} justify-between`}>
+              <div className={`${styles.noramlFlex}`}>
+                <input
+                  type="checkbox"
+                  name="remember-me"
+                  id="remember-me"
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <label
+                  htmlFor="remember-me"
+                  className="ml-2 block text-sm text-gray-900"
+                >
+                  Remember me
+                </label>
+              </div>
+              <div className="text-sm">
+                <a
+                  href=".forgot-password"
+                  className="font-medium text-blue-600 hover:text-blue-500"
+                >
+                  Forgot your password?
+                </a>
+              </div>
+            </div>
+            <div>
+              <button
+                type="submit"
+                className="group relative w-full h-[40px] flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+              >
+                Submit
+              </button>
+            </div>
+            <div className={`${styles.noramlFlex} w-full`}>
+              <h4>Not have any account?</h4>
+              <Link to="/signup" className="text-blue-600 pl-2">
+                Sign Up
+              </Link>
+              </div>
+          </form>
+        </div>
       </div>
     </div>
-  );
+
+  )
 }
 
-export default LoginPage;
+export default Login
