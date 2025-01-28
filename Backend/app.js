@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const bcrypt = require("bcrypt");
 const cors = require('cors');
 const errorHandler = require('./middleware/error');
+const product = require('./controller/product');
 app.use(errorHandler);
 
 
@@ -14,7 +15,11 @@ app.use(express.urlencoded({ extended: true }));
 // Use CORS middleware
 app.use(cors());
 
+
+
 app.use("/api/v2/user",user);
+app.use("/api/v2/product", product);
+
 
 
 if(process.env.NODE_ENV !== "PRODUCTION") {
