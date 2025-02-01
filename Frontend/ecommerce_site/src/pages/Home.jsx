@@ -1,6 +1,7 @@
 //eslint-disable-next-line
 import React, { useEffect, useState } from "react";
 import Product from "../components/products";
+
 export default function Home() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true); // For loading state
