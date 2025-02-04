@@ -19,7 +19,7 @@ const validateProductData = (data) => {
 };
 
 router.post('/create-product', pupload.array('images', 10), async (req, res) => {
-    
+
     const { name, description, category, tags, price, stock, email } = req.body;
     const images = req.files.map((file) => file.path); // Get file paths
 
@@ -69,7 +69,7 @@ router.get('/get-products', async (req, res) => {
             if (product.images && product.images.length > 0) {
                 product.images = product.images.map(imagePath => {
                     // Image URLs are already prefixed with /products
-                    return imagePath;
+                    return imagePath.replace(/\\/g, '/')
                 });
             }
             return product;
@@ -89,7 +89,7 @@ router.get('/my-products', async (req, res) => {
         const productsWithFullImageUrl = products.map(product => {
             if (product.images && product.images.length > 0) {
                 product.images = product.images.map(imagePath => {
-                    return imagePath;
+                    return imagePath.replace(/\\/g, '/')
                 });
             }
             return product;

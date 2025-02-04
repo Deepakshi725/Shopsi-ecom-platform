@@ -28,3 +28,6 @@ const pstorage = multer.diskStorage({
 exports.upload = multer({ storage: storage });
 
 exports.pupload = multer({ storage: pstorage });
+
+
+
