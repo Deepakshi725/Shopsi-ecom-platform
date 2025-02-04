@@ -7,6 +7,7 @@ const cors = require('cors');
 const errorHandler = require('./middleware/error');
 const product = require('./controller/product');
 app.use(errorHandler);
+const path = require('path')
 
 
 app.use(express.json()); // Built-in middleware for parsing JSON
@@ -16,7 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
 
-
+app.use('/products', express.static(path.join(__dirname, 'products')));
 app.use("/api/v2/user",user);
 app.use("/api/v2/product", product);
 

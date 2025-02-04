@@ -1,5 +1,5 @@
 //eslint-disable-next-line
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { AiOutlinePlusCircle } from "react-icons/ai";
 import axios from "axios";
 
@@ -29,6 +29,13 @@ const CreateProduct = () => {
         const imagePreviews = files.map((file) => URL.createObjectURL(file));
         setPreviewImages((prevPreviews) => prevPreviews.concat(imagePreviews));
     };
+
+    useEffect(() => {
+        // Cleanup object URLs to avoid memory leaks
+        return () => {
+            previewImages.forEach((url) => URL.revokeObjectURL(url));
+        };
+    }, [previewImages]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -210,6 +217,7 @@ const CreateProduct = () => {
                         ))}
                     </div>
                 </div>
+                
                 <button
                     type="submit"
                     className="w-full mt-4 bg-blue-500 text-white p-2 rounded"

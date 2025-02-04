@@ -3,7 +3,8 @@ const mongoose = require('mongoose');
 const Product = require('../model/product');
 const User = require('../model/user');
 const router = express.Router();
-const { pupload } = require("../middleware/multer");
+const { pupload } = require("../multer");
+const path = require('path')
 
 const validateProductData = (data) => {
     const errors = [];
@@ -20,8 +21,15 @@ const validateProductData = (data) => {
 
 router.post('/create-product', pupload.array('images', 10), async (req, res) => {
     
+    // const { name, description, category, tags, price, stock, email } = req.body;
+    // const images = req.files.map((file) => file.path); // Get file paths
+    // console.log(images);
+
     const { name, description, category, tags, price, stock, email } = req.body;
-    const images = req.files.map((file) => file.path); // Get file paths
+    // Map uploaded files to accessible URLs
+    const images = req.files.map((file) => {
+        return `/products/${file.filename}`;
+    });
 
     const validationErrors = validateProductData({ name, description, category, price, stock, email });
     if (validationErrors.length > 0) {
