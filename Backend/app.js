@@ -6,6 +6,7 @@ const bcrypt = require("bcrypt");
 const cors = require('cors');
 const errorHandler = require('./middleware/error');
 const product = require('./controller/product');
+const path = require('path');
 app.use(errorHandler);
 
 
@@ -19,6 +20,8 @@ app.use(cors());
 
 app.use("/api/v2/user",user);
 app.use("/api/v2/product", product);
+app.use('/products' ,express.static(path.join(__dirname, 'products')));
+
 
 
 

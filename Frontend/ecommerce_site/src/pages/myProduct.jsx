@@ -17,6 +17,7 @@ export default function MyProducts() {
                 return res.json();
             })
             .then((data) => {
+                console.log("API Response:", data);
                 setProducts(data.products);
                 setLoading(false);
             })
