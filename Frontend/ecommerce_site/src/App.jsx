@@ -13,9 +13,13 @@ const App = () => {
       <Route path='/signup' element={<SignupPage/>}/>
       <Route path='/create-product' element={<CreateProduct/>}/>
       <Route path="/myproducts" element={<MyProducts/>} />
+      <Route path="/edit-product/:id" element={<CreateProduct />} />
+
     </Routes>
     </BrowserRouter>
   )
 }
+
+
 
 export default App
