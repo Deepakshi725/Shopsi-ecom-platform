@@ -1,9 +1,16 @@
 //eslint-disable-next-line
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { AiOutlinePlusCircle } from "react-icons/ai";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const CreateProduct = () => {
+
+    const { id } = useParams();
+    const navigate = useNavigate();
+    const isEdit = Boolean(id);
+
+
     const [images, setImages] = useState([]);
     const [previewImages, setPreviewImages] = useState([]);
     const [name, setName] = useState("");
@@ -20,6 +27,32 @@ const CreateProduct = () => {
         { title: "Books" },
         { title: "Home Appliances" },
     ];
+
+    useEffect(() => {
+        if (isEdit) {
+            axios
+                .get(`http://localhost:8000/api/v2/product/product/${id}`)
+                .then((response) => {
+                    const p = response.data.product;
+                    setName(p.name);
+                    setDescription(p.description);
+                    setCategory(p.category);
+                    setTags(p.tags || "");
+                    setPrice(p.price);
+                    setStock(p.stock);
+                    setEmail(p.email);
+                    if (p.images && p.images.length > 0) {
+                        setPreviewImages(
+                            p.images.map((imgPath) => `http://localhost:8000${imgPath}`)
+                        );
+                    }
+                })
+                .catch((err) => {
+                    console.error("Error fetching product:", err);
+                });
+        }
+    }, [id, isEdit]);
+
 
     const handleImagesChange = (e) => {
         const files = Array.from(e.target.files);
@@ -48,42 +81,57 @@ const CreateProduct = () => {
         });
 
 
-        const config = {
-            headers: {
-              "Content-Type": "multipart/form-data",
-              "Accept": "any",
-            },
-          };
+        // const config = {
+        //     headers: {
+        //       "Content-Type": "multipart/form-data",
+        //       "Accept": "any",
+        //     },
+        //   };
       
-          axios.post("http://localhost:8000/api/v2/product/create-product", formData, config).then((res) => {
-            console.log(res.data);
-          }).catch((err) => {
-            console.log(err);
-          });
+        //   axios.post("http://localhost:8000/api/v2/product/create-product", formData, config).then((res) => {
+        //     console.log(res.data);
+        //   }).catch((err) => {
+        //     console.log(err);
+        //   });
 
-        // try {
-        //     const response = await axios.post("http://localhost:8000/api/v2/product/create-product", formData, {
-        //         headers: {
-        //             "Content-Type": "multipart/form-data",
-        //             "Accept": "any",
-        //         },
-        //     });
-
-        //     if (response.status === 201) {
-        //         alert("Product created successfully!");
-        //         setImages([]);
-        //         setName("");
-        //         setDescription("");
-        //         setCategory("");
-        //         setTags("");
-        //         setPrice("");
-        //         setStock("");
-        //         setEmail("");
-        //     }
-        // } catch (err) {
-        //     console.error("Error creating product:", err);
-        //     alert("Failed to create product. Please check the data and try again.");
-        // }
+        try {
+            if (isEdit) {
+                const response = await axios.put(
+                    `http://localhost:8000/api/v2/product/update-product/${id}`,
+                    formData,
+                    {
+                        headers: { "Content-Type": "multipart/form-data" },
+                    }
+                );
+                if (response.status === 200) {
+                    alert("Product updated successfully!");
+                    navigate("/my-products");
+                }
+            } else {
+                const response = await axios.post(
+                    "http://localhost:8000/api/v2/product/create-product",
+                    formData,
+                    {
+                        headers: { "Content-Type": "multipart/form-data" },
+                    }
+                );
+                if (response.status === 201) {
+                    alert("Product created successfully!");
+                    setImages([]);
+                    setPreviewImages([]);
+                    setName("");
+                    setDescription("");
+                    setCategory("");
+                    setTags("");
+                    setPrice("");
+                    setStock("");
+                    setEmail("");
+                }
+            }
+        } catch (err) {
+            console.error("Error creating/updating product:", err);
+            alert("Failed to save product. Please check the data and try again.");
+        }
     };
 
     return (
@@ -214,7 +262,7 @@ const CreateProduct = () => {
                     type="submit"
                     className="w-full mt-4 bg-blue-500 text-white p-2 rounded"
                 >
-                    Create
+                {isEdit ? "Save Changes" : "Create"}
                 </button>
             </form>
         </div></div>
