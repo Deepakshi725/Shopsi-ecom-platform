@@ -41,7 +41,7 @@ const CreateProduct = () => {
                     setPrice(p.price);
                     setStock(p.stock);
                     setEmail(p.email);
-                    if (p.images && p.images.length > 0) {
+                    if (p.images || p.images.length > 0) {
                         setPreviewImages(
                             p.images.map((imgPath) => `http://localhost:8000${imgPath}`)
                         );
@@ -242,7 +242,6 @@ const CreateProduct = () => {
                         className="hidden"
                         multiple
                         onChange={handleImagesChange} // Corrected handler name
-                        required
                     />
                     <label htmlFor="upload" className="cursor-pointer p-2">
                         <AiOutlinePlusCircle size={20} color="#555" />
