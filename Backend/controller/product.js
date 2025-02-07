@@ -20,7 +20,7 @@ const validateProductData = (data) => {
 };
 
 router.post('/create-product', pupload.array('images', 10), async (req, res) => {
-    
+
     const { name, description, category, tags, price, stock, email } = req.body;
     const images = req.files.map((file) => {
         return `/products/${file.filename}`;
@@ -68,6 +68,16 @@ router.post('/create-product', pupload.array('images', 10), async (req, res) => 
 router.get('/get-products', async (req, res) => {
     try {
         const products = await Product.find();
+        const productsWithFullImageUrl = products.map(product => {
+            if (product.images && product.images.length > 0) {
+                product.images = product.images.map(imagePath => {
+                    // Image URLs are already prefixed with /products
+                    return imagePath.replace(/\\/g, '/')
+                });
+            }
+            return product;
+        });
+        res.status(200).json({ products: productsWithFullImageUrl });
         
         res.status(200).json({ products: products });
     } catch (err) {
@@ -81,6 +91,15 @@ router.get('/my-products', async (req, res) => {
     const { email } = req.query;
     try {
         const products = await Product.find({ email });
+        const productsWithFullImageUrl = products.map(product => {
+            if (product.images && product.images.length > 0) {
+                product.images = product.images.map(imagePath => {
+                    return imagePath.replace(/\\/g, '/')
+                });
+            }
+            return product;
+        });
+        res.status(200).json({ products: productsWithFullImageUrl });
         // const productsWithFullImageUrl = products.map(product => {
         //     if (product.images && product.images.length > 0) {
         //         product.images = product.images.map((image) => `${image}`);
@@ -123,11 +142,11 @@ router.put('/update-product/:id', pupload.array('images', 10), async (req, res) 
         }
 
         let updatedImages = existingProduct.images;
-        // if (req.files && req.files.length > 0) {
-        //     updatedImages = req.files.map((file) => {
-        //         return `/products/${path.basename(file.path)}`;
-        //     });
-        // }
+        if (req.files || req.files.length > 0) {
+            updatedImages = req.files.map((file) => {
+                return `/products/${path.basename(file.path)}`;
+            });
+        }
 
         const validationErrors = validateProductData({
             name,
@@ -162,5 +181,23 @@ router.put('/update-product/:id', pupload.array('images', 10), async (req, res) 
         res.status(500).json({ error: 'Server error. Could not update product.' });
     }
 });
+
+router.delete('/delete-product/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const existingProduct = await Product.findById(id);
+        if (!existingProduct) {
+            return res.status(404).json({ error: 'Product not found.' });
+        }
+
+        await existingProduct.deleteOne();
+        res.status(200).json({ message: '✅ Product deleted successfully' });
+    } catch (err) {
+        console.error('Server error:', err);
+        res.status(500).json({ error: 'Server error. Could not delete product.' });
+    }
+});
+
 
 module.exports = router;
