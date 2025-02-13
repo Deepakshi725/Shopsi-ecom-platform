@@ -2,7 +2,7 @@ import './App.css'
 // eslint-disable-next-line 
 import React from 'react'
 import {BrowserRouter,Routes,Route} from 'react-router-dom';
-import {LoginPage, SignupPage, Home, CreateProduct, MyProducts} from "./Routes/routes.js";
+import {LoginPage, SignupPage, Home, CreateProduct, MyProducts, Cart} from "./Routes/routes.js";
 
 const App = () => {
   return (
@@ -15,6 +15,7 @@ const App = () => {
       <Route path="/myproducts" element={<MyProducts/>} />
       {/* For edit product by id */}
       <Route path="/create-product/:id" element={<CreateProduct />} />
+      <Route path="/cart" element={<Cart />} />
 
     </Routes>
     </BrowserRouter>

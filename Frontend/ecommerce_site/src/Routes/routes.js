@@ -8,5 +8,7 @@ import CreateProduct from "../pages/createProduct.jsx";
 
 import MyProducts from "../pages/myProduct.jsx";
 
+import Cart from "../pages/cart.jsx";
 
-export {LoginPage,SignupPage,Home,CreateProduct,MyProducts}
+
+export {LoginPage,SignupPage,Home,CreateProduct,MyProducts,Cart}
