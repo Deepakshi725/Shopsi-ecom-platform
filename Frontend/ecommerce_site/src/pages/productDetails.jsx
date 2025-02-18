@@ -5,6 +5,7 @@ import axios from "axios";
 import Nav from "../components/nav";
 import { IoIosAdd } from "react-icons/io";
 import { IoIosRemove } from "react-icons/io";
+const email = "d@gmail.com"
 
 export default function ProductDetails() {
 	const { id } = useParams();
@@ -49,6 +50,22 @@ export default function ProductDetails() {
 	const handleDecrement = () => {
 		setQuantity((prevQuantity) => (prevQuantity > 1 ? prevQuantity - 1 : 1));
 	};
+
+	const addtocart = async () => {
+		try {
+			const response = await axios.post("http://localhost:8000/api/v2/product/cart",
+				{
+					userId: email,
+					productId: id,
+					quantity: quantity,
+				}
+			);
+			console.log("Added to cart:", response.data);
+		} catch (err) {
+			console.error("Error adding to cart:", err);
+		}
+	};
+
 
 	if (loading) {
 		return (
@@ -180,7 +197,8 @@ export default function ProductDetails() {
 							</div>
 
 							<div className="flex flex-wrap gap-x-5 my-3">
-								<button className="bg-black text-white px-5 py-2 rounded-full hover:bg-neutral-800 hover:-translate-y-1.5 active:translate-y-0 transition-transform duration-200 ease-in-out active:duration-0 active:ease-linear">
+								<button className="bg-black text-white px-5 py-2 rounded-full hover:bg-neutral-800 hover:-translate-y-1.5 active:translate-y-0 
+								transition-transform duration-200 ease-in-out active:duration-0 active:ease-linear" onClick={addtocart}>
 									Add to Cart
 								</button>
 							</div>
