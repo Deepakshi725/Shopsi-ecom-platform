@@ -105,7 +105,7 @@ const CreateProduct = () => {
                 );
                 if (response.status === 200) {
                     alert("Product updated successfully!");
-                    navigate("/my-products");
+                    navigate("/myproducts");
                 }
             } else {
                 const response = await axios.post(

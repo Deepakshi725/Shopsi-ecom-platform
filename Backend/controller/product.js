@@ -79,7 +79,7 @@ router.get('/get-products', async (req, res) => {
         });
         res.status(200).json({ products: productsWithFullImageUrl });
         
-        res.status(200).json({ products: products });
+       // res.status(200).json({ products: products });
     } catch (err) {
         console.error(' Server error:', err);
         res.status(500).json({ error: 'Server error. Could not fetch products.' });
@@ -109,7 +109,7 @@ router.get('/my-products', async (req, res) => {
         //     }
         //     return product;
         // });
-        res.status(200).json({ products: products });
+       // res.status(200).json({ products: products });
     } catch (err) {
         console.error(' Server error:', err);
         res.status(500).json({ error: 'Server error. Could not fetch products.' });
@@ -199,5 +199,54 @@ router.delete('/delete-product/:id', async (req, res) => {
     }
 });
 
+router.post('/cart', async (req, res) => {
+    try {
+        const { userId, productId, quantity } = req.body;
+        const email = userId;
+
+        if (!email) {
+            return res.status(400).json({ message: 'Email is required' });
+        }
+
+        if (!mongoose.Types.ObjectId.isValid(productId)) {
+            return res.status(400).json({ message: 'Invalid productId' });
+        }
+
+        if (!quantity || quantity < 1) {
+            return res.status(400).json({ message: 'Quantity must be at least 1' });
+        }
+
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        const product = await Product.findById(productId);
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+
+        const cartItemIndex = user.cart.findIndex(
+            (item) => item.productId.toString() === productId
+        );
+
+
+        if (cartItemIndex > -1) {
+            user.cart[cartItemIndex].quantity += quantity;
+        } else {
+            user.cart.push({ productId, quantity });
+        }
+
+        await user.save();
+
+        res.status(200).json({
+            message: 'Cart updated successfully',
+            cart: user.cart,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+});
 
 module.exports = router;
