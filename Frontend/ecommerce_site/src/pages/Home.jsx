@@ -1,6 +1,7 @@
 //eslint-disable-next-line
 import React, { useEffect, useState } from "react";
 import Product from "../components/products";
+import Nav from "../components/nav";
 
 export default function Home() {
   const [products, setProducts] = useState([]);
@@ -35,6 +36,8 @@ export default function Home() {
   }
 
   return (
+    <>
+      <Nav />
     <div className="min-h-screen bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-12 flex flex-col justify-center sm:px-6 lg:px-8">
       <h1 className="text-3xl text-center text-white py-6">Product Gallery</h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 p-4">
@@ -43,5 +46,6 @@ export default function Home() {
         ))}
       </div>
     </div>
+    </>
   );
 }
