@@ -12,5 +12,7 @@ import Cart from "../pages/cart.jsx";
 
 import ProductDetails from "../pages/productDetails.jsx";
 
+import Profile from "../pages/Profile.jsx";
 
-export {LoginPage,SignupPage,Home,CreateProduct,MyProducts,Cart,ProductDetails}
+
+export {LoginPage,SignupPage,Home,CreateProduct,MyProducts,Cart,ProductDetails,Profile}
