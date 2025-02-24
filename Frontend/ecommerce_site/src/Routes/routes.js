@@ -14,5 +14,7 @@ import ProductDetails from "../pages/productDetails.jsx";
 
 import Profile from "../pages/Profile.jsx";
 
+import CreateAddress from "../pages/createAddress.jsx";
 
-export {LoginPage,SignupPage,Home,CreateProduct,MyProducts,Cart,ProductDetails,Profile}
+
+export {LoginPage,SignupPage,Home,CreateProduct,MyProducts,Cart,ProductDetails,Profile,CreateAddress}
