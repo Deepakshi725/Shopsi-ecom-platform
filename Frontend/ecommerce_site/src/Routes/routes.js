@@ -16,5 +16,7 @@ import Profile from "../pages/Profile.jsx";
 
 import CreateAddress from "../pages/createAddress.jsx";
 
+import SelectAddress from "../pages/selectAddress.jsx";
 
-export {LoginPage,SignupPage,Home,CreateProduct,MyProducts,Cart,ProductDetails,Profile,CreateAddress}
+
+export {LoginPage,SignupPage,Home,CreateProduct,MyProducts,Cart,ProductDetails,Profile,CreateAddress,SelectAddress}
