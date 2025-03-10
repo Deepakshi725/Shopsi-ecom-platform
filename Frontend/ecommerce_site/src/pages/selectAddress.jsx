@@ -53,8 +53,8 @@ const SelectAddress = () => {
     }, [userEmail]);
 
     const handleSelectAddress = (addressId) => {
-        // Optionally, pass the entire address object instead of just the ID
-        navigate('/order-confirmation', { state: { addressId } });
+        // Navigate to Order Confirmation with the selected address ID and email
+        navigate('/order-confirmation', { state: { addressId, email: userEmail }});
     };
 
     // Render loading state
