@@ -7,6 +7,8 @@ const cors = require('cors');
 const errorHandler = require('./middleware/error');
 const product = require('./controller/product');
 const path = require('path');
+const orders = require('./controller/orders');// In milestone_26
+
 app.use(errorHandler);
 
 
@@ -18,8 +20,14 @@ app.use(cors());
 
 
 
+// Route Handling
 app.use("/api/v2/user",user);
 app.use("/api/v2/product", product);
+app.use("/api/v2/orders", orders); // In milestone_26
+
+
+// Serve static files for uploads and products
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); // In milestone_26
 app.use('/products' ,express.static(path.join(__dirname, 'products')));
 
 
