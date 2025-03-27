@@ -20,4 +20,6 @@ import SelectAddress from "../pages/selectAddress.jsx";
 
 import OrderConfirmation from "../pages/orderConfirmation.jsx";
 
-export {LoginPage,SignupPage,Home,CreateProduct,MyProducts,Cart,ProductDetails,Profile,CreateAddress,SelectAddress,OrderConfirmation}
+import MyOrdersPage from "../pages/myorders.jsx";
+
+export {LoginPage,SignupPage,Home,CreateProduct,MyProducts,Cart,ProductDetails,Profile,CreateAddress,SelectAddress,OrderConfirmation,MyOrdersPage}
