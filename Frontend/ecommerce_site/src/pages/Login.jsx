@@ -4,8 +4,9 @@ import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import styles from "../styles/style";
 import { Link } from "react-router-dom";
 import axios from "axios";
-//import { useDispatch } from 'react-redux';
-//import { setemail } from "../../store/userActions";
+import { useDispatch } from 'react-redux';
+import { setemail } from "../../store/userActions";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 
 // const Login = () => {
@@ -25,19 +26,26 @@ import axios from "axios";
  
 
 const Login = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate(); // Initialize navigate
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [visible, setVisible] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const response = await axios.post("http://localhost:8000/api/v2/user/login", { email, password });
       console.log(response.data);
+            // Dispatch action to store email in Redux state
+            dispatch(setemail(email));
+            // Redirect to profile page after successful login
+            navigate("/");
     } catch (error) {
       console.error("There was an error logging in!", error);
     }
   };
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [visible, setVisible] = useState(false);
+
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-12 flex flex-col justify-center sm:px-6 lg:px-8">

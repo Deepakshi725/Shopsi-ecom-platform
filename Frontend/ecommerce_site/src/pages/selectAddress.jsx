@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import Nav from '../components/nav'; // Ensure the path is correct and component name matches
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux'; // Import useSelector
 
 // Optionally, if you have a context or a way to get the authenticated user's email, import it
 // import { useAuth } from '../contexts/AuthContext';
@@ -12,14 +13,15 @@ const SelectAddress = () => {
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
-    // Optionally, get the authenticated user's email from context or props
-    // const { user } = useAuth();
-    const userEmail = 'd@gmail.com'; // Replace with dynamic email in production
+      // Retrieve email from Redux state
+      const userEmail = useSelector((state) => state.user.email);
 
     useEffect(() => {
         const fetchAddresses = async () => {
             try {
-                const response = await fetch(`http://localhost:8000/api/v2/user/addresses?email=${'d@gmail.com'}`);
+                const response = await fetch('http://localhost:8000/api/v2/user/addresses', {
+                    params: { email: userEmail },
+                });
 
                 if (!response.ok) {
                     // Handle specific HTTP errors
@@ -32,7 +34,7 @@ const SelectAddress = () => {
                     }
                 }
 
-                const data = await response.json();
+                const data = response.data;
 
                 // Validate the response structure
                 if (data && Array.isArray(data.addresses)) {

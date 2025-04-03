@@ -1,20 +1,24 @@
 //eslint-disable-next-line
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import Nav from '../components/nav'
+import { useSelector } from 'react-redux'; // Import useSelector
 
 const MyOrdersPage = () => {
     const [orders, setOrders] = useState([]);
-    const defaultEmail = 'd@gmail.com';
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
-    const fetchOrders = async () => {
+        // Retrieve email from Redux state
+        const email = useSelector((state) => state.user.email);
+
+        const fetchOrders = useCallback(async () => {
+        if (!email) return; // Only fetch if email is available
         try {
             setLoading(true);
             setError('');
             const response = await axios.get('http://localhost:8000/api/v2/orders/my-orders', {
-                params: { email: defaultEmail },
+                params: { email },
             });
             setOrders(response.data.orders);
         } catch (err) {
@@ -22,11 +26,11 @@ const MyOrdersPage = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [email]); // Dependency array includes email
 
     // Cancel order handler
     const cancelOrder = async (orderId) => {
-        console.log("aa")
+
         try {
             const response = await axios.patch(`http://localhost:8000/api/v2/orders/cancel-order/${orderId}`);
             // Update the order in local state: either remove or update its status.
@@ -35,7 +39,8 @@ const MyOrdersPage = () => {
                     order._id === orderId ? { ...order, status: response.data.order.status } : order
                 )
             );
-            fetchOrders();
+                                // Refetch updated orders
+                                await fetchOrders();
         } catch (err) {
             console.error(err);
             alert(err.response?.data?.message || 'Error cancelling order');
@@ -44,7 +49,7 @@ const MyOrdersPage = () => {
 
     useEffect(() => {
         fetchOrders();
-    }, []);
+    }, [fetchOrders]); // Dependency array includes email
 
     return (
         <>
