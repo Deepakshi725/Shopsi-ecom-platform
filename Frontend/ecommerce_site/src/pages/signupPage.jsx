@@ -5,6 +5,8 @@ import styles from "../styles/style";
 import { Link } from "react-router-dom";
 import { RxAvatar } from "react-icons/rx";
 import axios from 'axios';
+//import { useDispatch } from 'react-redux';
+//import { setemail } from "../../store/userActions";
 
 const SignupPage = () => {
   const [email, setEmail] = useState("");
@@ -26,14 +28,11 @@ const SignupPage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const trimmedEmail = email.trim();
-    const trimmedPassword = password.trim();
-  
     const newForm = new FormData();
     newForm.append("file", avatar);
     newForm.append("name", name);
-    newForm.append("email", trimmedEmail); // Use trimmed email
-    newForm.append("password", trimmedPassword); // Use trimmed password
+    newForm.append("email", email); 
+    newForm.append("password", password); 
   
     const config = {
       headers: {

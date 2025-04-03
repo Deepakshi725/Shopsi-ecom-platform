@@ -7,7 +7,7 @@ const cors = require('cors');
 const errorHandler = require('./middleware/error');
 const product = require('./controller/product');
 const path = require('path');
-const orders = require('./controller/orders');// In milestone_26
+const orders = require('./controller/order');// In milestone_26
 
 app.use(errorHandler);
 
