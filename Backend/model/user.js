@@ -73,6 +73,15 @@ const userSchema = new mongoose.Schema({
   },
 ],
 
+/*...................
+
+The cart field contains an array of objects, each with:
+productId: References a Product from the Product collection.
+quantity: Stores how many units of that product the user wants.
+This structure allows a user to have multiple products in their cart.
+
+......................*/
+
  createdAt:{
   type: Date,
   default: Date.now(),

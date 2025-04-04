@@ -215,6 +215,7 @@ router.post('/cart',isAuthenticatedUser, async (req, res) => {
         }
 
         if (!mongoose.Types.ObjectId.isValid(productId)) {
+            //Uses Mongoose to verify whether productId is a valid MongoDB ObjectId.
             return res.status(400).json({ message: 'Invalid productId' });
         }
 
@@ -228,22 +229,31 @@ router.post('/cart',isAuthenticatedUser, async (req, res) => {
         }
 
         const product = await Product.findById(productId);
+        //Searches for the product by its productId using findById.
         if (!product) {
             return res.status(404).json({ message: 'Product not found' });
         }
 
         const cartItemIndex = user.cart.findIndex(
+            //user.cart is assumed to be an array of objects, where each object represents a cart item.
+            //The .findIndex() method checks if a product with the given productId already exists in the user's cart.
+
             (item) => item.productId.toString() === productId
+            //item.productId.toString() === productId converts productId to a string for a proper comparison.
         );
 
 
         if (cartItemIndex > -1) {
             user.cart[cartItemIndex].quantity += quantity;
+            // If the product already exists in the cart (cartItemIndex > -1), its quantity is increased.
         } else {
             user.cart.push({ productId, quantity });
+            //If the product is not in the cart, a new cart item { productId, quantity } is added.
         }
 
+
         await user.save();
+        //Saves the modified user document (with the updated cart) back to the database.
 
         res.status(200).json({
             message: 'Cart updated successfully',
