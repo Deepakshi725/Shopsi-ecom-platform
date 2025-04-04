@@ -8,22 +8,8 @@ import { useDispatch } from 'react-redux';
 import { setemail } from "../../store/userActions";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 
-
-// const Login = () => {
-//   const [email, setEmail] = useState("");
-//   const [password, setPassword] = useState("");
-//   const [visible, setVisible] = useState(false);
-  
-
-//   const handleSubmit = (e) => {
-//     e.preventDefault();
-//       axios.post("http://localhost:8000/api/v2/user/login", { email, password }).then((res)=>{
-//       console.log(res.data);
-//     }).catch ((error)=> { 
-//       console.error("There was an error logging in!", error);
-//     });
-//   };
- 
+// Ensure axios sends cookies with requests
+axios.defaults.withCredentials = true;
 
 const Login = () => {
   const dispatch = useDispatch();
