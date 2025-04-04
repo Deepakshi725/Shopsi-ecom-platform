@@ -2,8 +2,11 @@ const express = require('express');
 const router = express.Router();
 const Order = require('../model/order'); // Adjust path as needed
 const User = require('../model/user');   // Adjust path as needed
+const { isAuthenticatedUser } = require('../middleware/auth');
 
-router.post('/place-order', async (req, res) => {
+
+// 1) Place Orders
+router.post('/place-order', isAuthenticatedUser, async (req, res) => {
     try {
         const { email, orderItems, shippingAddress } = req.body;
 
@@ -38,8 +41,9 @@ router.post('/place-order', async (req, res) => {
 
         const orders = await Promise.all(orderPromises);
 
-        // Clear user's cart after placing orders (assuming a Cart model exists)
-        await Cart.deleteMany({ user: user._id });
+        // Clear cart
+        user.cart = [];
+        await user.save();
 
         res.status(201).json({ message: 'Orders placed and cart cleared successfully.', orders });
     } catch (error) {
@@ -48,7 +52,8 @@ router.post('/place-order', async (req, res) => {
     }
 });
 
-router.get('/my-orders', async (req, res) => {
+// 2) Get My Orders
+router.get('/my-orders', isAuthenticatedUser, async (req, res) => {
     try {
         const { email } = req.query;
 
@@ -73,7 +78,8 @@ router.get('/my-orders', async (req, res) => {
     }
 });
 
-router.patch('/cancel-order/:orderId', async (req, res) => {
+// 3) Another route to get My Orders
+router.patch('/cancel-order/:orderId',isAuthenticatedUser, async (req, res) => {
     try {
         const { orderId } = req.params;
         console.log("fff")

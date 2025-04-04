@@ -14,8 +14,10 @@ if (process.env.NODE_ENV !== 'PRODUCTION') {
           `Database is connected Successfully: ${data.connection.host}`
         );
       })
-      .catch((er) => console.log('Database connection Failed...', er.message));
-      //process.exit(1); // Exit process to avoid running with an invalid DB connection
+      .catch((err) => {
+      console.error(`Database connection failed: ${err.message}`);
+      process.exit(1);
+    });
   };
   
   module.exports = connectDatabase;

@@ -4,6 +4,7 @@ import AddressCard from "../components/AddressCard";
 import Nav from "../components/nav";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux"; // Import useSelector
+import axios from "../axiosConfig";
 
 export default function Profile() {
 		// Retrieve email from Redux state
@@ -19,7 +20,7 @@ export default function Profile() {
 	const navigate = useNavigate();
 
 	useEffect(() => {
-		fetch(
+		axios.get(
 			`http://localhost:8000/api/v2/user/profile?email=${email}`,
 			{
 				method: "GET",
@@ -28,18 +29,13 @@ export default function Profile() {
 				},
 			}
 		)
-			.then((res) => {
-				if (!res.ok) {
-					throw new Error(`HTTP error! status: ${res.status}`);
-				}
-				return res.json();
+		.then((data) => {
+			setPersonalDetails(data.user);
+			setAddresses(data.addresses);
+			console.log("User fetched:", data.user);
+			console.log("Addresses fetched:", data.addresses);
 			})
-			.then((data) => {
-				setPersonalDetails(data.user);
-				setAddresses(data.addresses);
-				console.log("User fetched:", data.user);
-				console.log("Addresses fetched:", data.addresses);
-			});
+		.catch((err) => console.error(err));
 	}, [email]);
 
 	const handleAddAddress = () => {
