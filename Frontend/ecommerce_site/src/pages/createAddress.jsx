@@ -1,6 +1,6 @@
 //eslint-disable-next-line
 import React, { useState } from "react";
-import axios from "axios";
+import axios from "../axiosConfig";
 import { useNavigate } from "react-router-dom";
 import Nav from "../components/nav";
 import { useSelector } from "react-redux"; // Import useSelector
@@ -20,6 +20,9 @@ const CreateAddress = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!email) return alert("No email found in Redux state!"); //added
+
         const addressData = {
             country,
             city,

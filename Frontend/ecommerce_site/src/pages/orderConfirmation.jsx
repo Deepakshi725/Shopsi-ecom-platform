@@ -1,8 +1,8 @@
 //eslint-disable-next-line
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import Nav from '../components/nav';
 import { useLocation, useNavigate } from 'react-router-dom';
+import axios from '../axiosConfig';
 
 // 1) Import PayPalScriptProvider & PayPalButtons
 import { PayPalScriptProvider, PayPalButtons } from '@paypal/react-paypal-js';
@@ -30,6 +30,7 @@ const OrderConfirmation = () => {
 
         const fetchData = async () => {
             try {
+                // 1) Fetch addresses
                 // Fetch selected address
                 const addressResponse = await axios.get('http://localhost:8000/api/v2/user/addresses', {
                     params: { email: email },
@@ -46,6 +47,7 @@ const OrderConfirmation = () => {
                 }
                 setSelectedAddress(address);
 
+                // 2) Fetch cart
                 // Fetch cart products from /cartproducts endpoint
                 const cartResponse = await axios.get('http://localhost:8000/api/v2/product/cartproducts', {
                     params: { email: email },

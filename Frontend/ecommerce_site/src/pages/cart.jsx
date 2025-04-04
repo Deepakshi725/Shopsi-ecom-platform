@@ -3,6 +3,7 @@ import Nav from '../components/nav';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
 import { useSelector } from 'react-redux'; // Import useSelector
+import axios from '../axiosConfig'; // <--- use your configured axios
 
 const Cart = () => {
 
@@ -17,13 +18,7 @@ const Cart = () => {
           // Only fetch if email is available
     if (!email) return;
 
-        fetch(`http://localhost:8000/api/v2/product/cartproducts?email=$${email}`)
-          .then((res) => {
-            if (!res.ok) {
-              throw new Error(`HTTP error! status: ${res.status}`);
-            }
-            return res.json();
-          })
+        axios.get(`http://localhost:8000/api/v2/product/cartproducts?email=$${email}`)
           .then((data) => {
             setProducts(data.cart.map(product => ({quantity: product['quantity'], ...product['productId']})));
             console.log("Products fetched:", data.cart);
@@ -33,7 +28,6 @@ const Cart = () => {
           });
       }, [email]);
     
-      console.log("Products:", products);
 
       const handlePlaceOrder = () => {
         navigate('/select-address'); // Navigate to the Select Address page

@@ -5,6 +5,7 @@ const User = require('../model/user');
 const router = express.Router();
 const { pupload } = require("../multer");
 const path = require('path');
+const { isAuthenticatedUser } = require('../middleware/auth');
 
 const validateProductData = (data) => {
     const errors = [];
@@ -19,7 +20,8 @@ const validateProductData = (data) => {
     return errors;
 };
 
-router.post('/create-product', pupload.array('images', 10), async (req, res) => {
+// 1) Create a product
+router.post('/create-product',isAuthenticatedUser, pupload.array('images', 10), async (req, res) => {
 
     const { name, description, category, tags, price, stock, email } = req.body;
     const images = req.files.map((file) => {
@@ -64,8 +66,8 @@ router.post('/create-product', pupload.array('images', 10), async (req, res) => 
     }
 });
 
-// Route: Get all products
-router.get('/get-products', async (req, res) => {
+//2) Route: Get all products
+router.get('/get-products',isAuthenticatedUser, async (req, res) => {
     try {
         const products = await Product.find();
         const productsWithFullImageUrl = products.map(product => {
@@ -86,8 +88,8 @@ router.get('/get-products', async (req, res) => {
     }
 });
 
-
-router.get('/my-products', async (req, res) => {
+// 3) Get my products
+router.get('/my-products',isAuthenticatedUser, async (req, res) => {
     const { email } = req.query;
     try {
         const products = await Product.find({ email });
@@ -117,7 +119,8 @@ router.get('/my-products', async (req, res) => {
 }
 );
 
-router.get('/product/:id', async (req, res) => {
+// 4) Get product by ID
+router.get('/product/:id',isAuthenticatedUser, async (req, res) => {
     const { id } = req.params;
     try {
         const product = await Product.findById(id);
@@ -131,7 +134,8 @@ router.get('/product/:id', async (req, res) => {
     }
 });
 
-router.put('/update-product/:id', pupload.array('images', 10), async (req, res) => {
+// 5) Update product
+router.put('/update-product/:id',isAuthenticatedUser, pupload.array('images', 10), async (req, res) => {
     const { id } = req.params;
     const { name, description, category, tags, price, stock, email } = req.body;
 
@@ -182,7 +186,8 @@ router.put('/update-product/:id', pupload.array('images', 10), async (req, res) 
     }
 });
 
-router.delete('/delete-product/:id', async (req, res) => {
+// 6) Delete product
+router.delete('/delete-product/:id',isAuthenticatedUser, async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -199,7 +204,8 @@ router.delete('/delete-product/:id', async (req, res) => {
     }
 });
 
-router.post('/cart', async (req, res) => {
+// 7) Add to cart
+router.post('/cart',isAuthenticatedUser, async (req, res) => {
     try {
         const { userId, productId, quantity } = req.body;
         const email = userId;
@@ -259,8 +265,9 @@ router.post('/cart', async (req, res) => {
     }
 });
 
+// 8) Get cart details
 // GET cart details endpoint
-router.get('/cartproducts', async (req, res) => {
+router.get('/cartproducts',isAuthenticatedUser, async (req, res) => {
     try {
         const { email } = req.query;
         if (!email) {
@@ -275,6 +282,39 @@ router.get('/cartproducts', async (req, res) => {
         }
         res.status(200).json({
             message: 'Cart retrieved successfully',
+            cart: user.cart
+        });
+    } catch (err) {
+        console.error('Server error:', err);
+        res.status(500).json({ error: 'Server Error' });
+    }
+});
+
+// 9) Update cart quantity
+router.put('/cartproduct/quantity',isAuthenticatedUser, async (req, res) => {
+    const { email, productId, quantity } = req.body;
+    console.log("Updating cart product quantity");
+
+    if (!email || !productId || quantity === undefined) {
+        return res.status(400).json({ error: 'Email, productId, and quantity are required' });
+    }
+
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        const cartProduct = user.cart.find(item => item.productId.toString() === productId);
+        if (!cartProduct) {
+            return res.status(404).json({ error: 'Product not found in cart' });
+        }
+
+        cartProduct.quantity = quantity;
+        await user.save();
+
+        res.status(200).json({
+            message: 'Cart product quantity updated successfully',
             cart: user.cart
         });
     } catch (err) {

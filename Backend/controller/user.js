@@ -13,6 +13,7 @@ require("dotenv").config();
 
 JWT_SECRET = "9f1e345b1a84a7c8d0b9e6f2e20dbb7e01c7aa40f7e3e2ad6e92750f60e4a2c9y"
 
+// 1) Create user
 router.post("/create-user", upload.single("file"), catchAsyncErrors(async (req, res, next) => {
     console.log("Creating user...");
     let { name, email, password } = req.body;
@@ -56,6 +57,7 @@ router.post("/create-user", upload.single("file"), catchAsyncErrors(async (req, 
 }));
 
 
+// 2) Login
 // In your login route (e.g., routes/user.js)
 router.post("/login-user", catchAsyncErrors(async (req, res, next) => {
     console.log("Logging in user...");
@@ -110,7 +112,8 @@ router.post("/login-user", catchAsyncErrors(async (req, res, next) => {
     });
 }));
 
-router.get("/profile", catchAsyncErrors(async (req, res, next) => {
+// 3) Get profile
+router.get("/profile",isAuthenticatedUser, catchAsyncErrors(async (req, res, next) => {
     const { email } = req.query;
     if (!email) {
         return next(new ErrorHandler("Please provide an email", 400));
@@ -131,7 +134,8 @@ router.get("/profile", catchAsyncErrors(async (req, res, next) => {
     });
 }));
 
-router.post("/add-address", catchAsyncErrors(async (req, res, next) => {
+// 4) Add address
+router.post("/add-address",isAuthenticatedUser, catchAsyncErrors(async (req, res, next) => {
     const { country, city, address1, address2, zipCode, addressType, email } = req.body;
 
     const user = await User.findOne({ email });
@@ -158,7 +162,8 @@ router.post("/add-address", catchAsyncErrors(async (req, res, next) => {
     });
 }));
 
-router.get("/addresses", catchAsyncErrors(async (req, res, next) => {
+// 5) Get addresses
+router.get("/addresses",isAuthenticatedUser, catchAsyncErrors(async (req, res, next) => {
     const { email } = req.query;
     if (!email) {
         return next(new ErrorHandler("Please provide an email", 400));

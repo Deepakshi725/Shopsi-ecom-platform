@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import MyProduct from "../components/myProduct";
 import { useSelector } from "react-redux";
+import axios from "../axiosConfig";
 
 export default function MyProducts() {
     const [products, setProducts] = useState([]);
@@ -16,15 +17,8 @@ export default function MyProducts() {
                 // Only fetch if email is available
                 if (!email) return;
                 
-        fetch(`http://localhost:8000/api/v2/product/my-products?email=${email}`)
-            .then((res) => {
-                if (!res.ok) {
-                    throw new Error(`HTTP error! status: ${res.status}`);
-                }
-                return res.json();
-            })
+        axios.get(`http://localhost:8000/api/v2/product/my-products?email=${email}`)
             .then((data) => {
-                console.log("API Response:", data);
                 setProducts(data.products);
                 setLoading(false);
             })
