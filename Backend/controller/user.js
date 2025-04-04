@@ -7,126 +7,11 @@ const { upload } = require("../middleware/multer");
 const ErrorHandler = require("../utils/ErrorHandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken"); // Import JSON Web Token
 require("dotenv").config();
 
 
-// router.post("/create-user", upload.single("file"), catchAsyncErrors(async (req, res, next) => {
-//     console.log("Creating user...");
-//     const { name, email, password } = req.body;
-
-//     const userEmail = await User.findOne({ email });
-//     if (userEmail) {
-//         if (req.file) {
-//             const filepath = path.join(__dirname, "../uploads", req.file.filename);
-//             try {
-//                 fs.unlinkSync(filepath);
-//             } catch (err) {
-//                 console.log("Error removing file:", err);
-//                 return res.status(500).json({ message: "Error removing file" });
-//             }
-//         }
-//         return next(new ErrorHandler("User already exists", 400));
-//     }
-
-//     let fileUrl = "";
-//     if (req.file) {
-//         fileUrl = path.join("uploads", req.file.filename);
-//     }
-//     const hashedPassword = await bcrypt.hash(password, 10);
-//     console.log("At Create ", "Password: ", password, "Hash: ", hashedPassword);
-
-//     const user = await User.create({
-//         name,
-//         email,
-//         password: hashedPassword,
-//         avatar: {
-//             public_id: req.file?.filename || "",
-//             url: fileUrl,
-//         },
-//     }); 
-//     console.log(user)
-//     res.status(201).json({ success: true, user });
-// }));
-
-// // router.post("/login", catchAsyncErrors(async (req, res, next) => {
-// //     console.log("Logging in user...");
-// //     const { email, password } = req.body;
-// //     if (!email || !password) {
-// //         return next(new ErrorHandler("Please provide email and password", 400));
-// //     }
-// //     const user_authen = await User.findOne({ email }).select("+password");
-// //     if (!user_authen) {
-// //         return next(new ErrorHandler("Invalid Email or Password`", 401));
-// //     }
-
-// //     const isPasswordMatched = await bcrypt.compare(password, user_authen.password);
-
-// //     console.log("Password Match Result:", isPasswordMatched);
-// //     console.log("At Auth", "Password: ", password, "Hash: ", user_authen.password);
-// //     if (!isPasswordMatched) {
-// //         return next(new ErrorHandler("Invalid Email or Password", 401));
-// //     }
-
-// //     // if(user_authen && await bcrypt.compare(password, user_authen.password)){
-// //     //     console.log(user_authen)
-// //     // }else{
-// //     //     console.log("Wrong password");
-// //     // }
-    
-// //      console.log(user_authen)
-// //     res.status(200).json({
-// //         success: true,
-// //         user_authen,
-// //     });
-// // }));
-
-
-// router.post("/login", catchAsyncErrors(async (req, res, next) => {
-//     console.log("Logging in user...");
-
-//     const { email, password } = req.body;
-//     console.log("Password from req.body:", password);
-
-
-//     // Check if both email and password are provided
-//     if (!email || !password) {
-//         return next(new ErrorHandler("Please provide both email and password.", 400));
-//     }
-
-//     // Fetch the user by email, including the password field
-//     const user_authen = await User.findOne({ email }).select("+password");
-
-//     // Check if user exists
-//     if (!user_authen) {
-//         console.log("No user found with the provided email.");
-//         return next(new ErrorHandler("No such email found. Please register first.", 401));
-//     }
-
-//     // Compare the provided password with the stored hashed password
-//     const isPasswordMatched = await bcrypt.compare( password, user_authen.password);
-//     console.log("Password Match Result:", isPasswordMatched);
-//     console.log("At Auth - Password: ", password, "Hash: ", user_authen.password);
-
-//     // Check if the password matches
-//     if (!isPasswordMatched) {
-//         console.log("Password mismatch.");
-//         console.log(password, user_authen.password);
-//         return next(new ErrorHandler("Authentication failed. Invalid password.", 401));
-//     }
-
-//     // Successful login
-//     console.log("User authentication successful. User details:", user_authen);
-//     res.status(200).json({
-//         success: true,
-//         message: "Login successful.",
-//         user: {
-//             id: user_authen._id,
-//             email: user_authen.email,
-//             name: user_authen.name, // Include other relevant user details as needed
-//         },
-//     });
-// }));
-
+JWT_SECRET = "9f1e345b1a84a7c8d0b9e6f2e20dbb7e01c7aa40f7e3e2ad6e92750f60e4a2c9y"
 
 router.post("/create-user", upload.single("file"), catchAsyncErrors(async (req, res, next) => {
     console.log("Creating user...");
@@ -170,6 +55,8 @@ router.post("/create-user", upload.single("file"), catchAsyncErrors(async (req, 
     res.status(201).json({ success: true, user });
 }));
 
+
+// In your login route (e.g., routes/user.js)
 router.post("/login-user", catchAsyncErrors(async (req, res, next) => {
     console.log("Logging in user...");
 
@@ -198,15 +85,28 @@ router.post("/login-user", catchAsyncErrors(async (req, res, next) => {
         return next(new ErrorHandler("Authentication failed. Invalid password.", 401));
     }
 
+
+        // Generate JWT token
+        const token = jwt.sign(
+            { id: user_authen._id, email: user_authen.email },
+            process.env.JWT_SECRET || "your_jwt_secret",
+            { expiresIn: "1h" }
+        );
+    
+        // Set token in an HttpOnly cookie
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production", // use true in production
+            sameSite: "Strict",
+            maxAge: 3600000, // 1 hour
+        });
+
+
     // Successful login
+    user_authen.password = undefined; // Remove password from response
     res.status(200).json({
         success: true,
-        message: "Login successful.",
-        user: {
-            id: user_authen._id,
-            email: user_authen.email,
-            name: user_authen.name, // Include other relevant user details as needed
-        },
+        user_authen,
     });
 }));
 
