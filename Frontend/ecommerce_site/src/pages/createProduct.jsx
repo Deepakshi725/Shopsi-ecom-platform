@@ -3,6 +3,7 @@ import React, { useState,useEffect } from "react";
 import { AiOutlinePlusCircle } from "react-icons/ai";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "../axiosConfig";
+import Nav from "../components/nav";
 
 const CreateProduct = () => {
 
@@ -135,6 +136,8 @@ const CreateProduct = () => {
     };
 
     return (
+        <>
+        <Nav />
         <div className="min-h-screen bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-12 flex flex-col justify-center sm:px-6 lg:px-8">
         <div className="w-[90%] max-w-[600px] bg-white shadow h-auto rounded-[4px] p-4 mx-auto">
             <h5 className="mt-6 text-center text-3xl font-bold text-gray-900">Create Product</h5>
@@ -265,6 +268,7 @@ const CreateProduct = () => {
                 </button>
             </form>
         </div></div>
+        </>
     );
 };
 

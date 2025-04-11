@@ -13,20 +13,47 @@ const Cart = () => {
       // Get the email from Redux state
   const email = useSelector((state) => state.user.email);
 
+    // useEffect(() => {
+
+    //       // Only fetch if email is available
+    // if (!email) return alert("error in display");
+
+    //     axios.get(`http://localhost:8000/api/v2/product/cartproducts?email=${email}`)
+    //       .then((data) => {
+    //         setProducts(data.cart.map(product => ({quantity: product['quantity'], ...product['productId']})));
+    //         console.log("Products fetched:", data.cart);
+    //       })
+    //       .catch((err) => {
+    //         console.error(" Error fetching products:", err);
+    //       });
+    //   }, [email]);
+    
+
     useEffect(() => {
-
-          // Only fetch if email is available
-    if (!email) return;
-
-        axios.get(`http://localhost:8000/api/v2/product/cartproducts?email=$${email}`)
-          .then((data) => {
-            setProducts(data.cart.map(product => ({quantity: product['quantity'], ...product['productId']})));
-            console.log("Products fetched:", data.cart);
-          })
-          .catch((err) => {
-            console.error(" Error fetching products:", err);
-          });
-      }, [email]);
+      if (!email) {
+        alert("Error in display: Email not available");
+        return;
+      }
+    
+      axios.get(`http://localhost:8000/api/v2/product/cartproducts?email=${email}`)
+        .then((response) => {
+          const cart = response.data.cart;
+          if (Array.isArray(cart)) {
+            setProducts(cart.map(product => ({
+              quantity: product['quantity'],
+              ...product['productId']
+            })));
+            console.log("Products fetched:", cart);
+          } else {
+            console.error("Cart is not an array:", cart);
+            setProducts([]);
+          }
+        })
+        .catch((err) => {
+          console.error("Error fetching products:", err);
+          setProducts([]);
+        });
+    }, [email]);
     
 
       const handlePlaceOrder = () => {
