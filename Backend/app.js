@@ -2,7 +2,6 @@ const express = require("express");
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const ErrorHandler = require('./middleware/error');
-const product = require('./controller/product');
 const path = require('path');
 const cookieParser = require("cookie-parser");
 
@@ -19,15 +18,15 @@ app.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));
 
 // Configure CORS to allow requests from React frontend
 app.use(cors({
-    origin: 'http://localhost:3000', // Update this if your frontend is hosted elsewhere
+    origin: 'http://localhost:5173', // Update this if your frontend is hosted elsewhere
     credentials: true, // Enable if you need to send cookies or authentication headers
   }));
 
 
 // Import Routes
-const userRoutes = require("./controller/user");
-const productRoutes = require('./controller/product');
-const orders = require('./controller/orders');
+const user = require('./controller/user');
+const product = require('./controller/product');
+const orders = require('./controller/order');
 
 // Route Handling
 app.use("/api/v2/user",user);
