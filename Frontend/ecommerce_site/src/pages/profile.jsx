@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux"; // Import useSelector
 import axios from "../axiosConfig";
 
+
 export default function Profile() {
 		// Retrieve email from Redux state
 		const email = useSelector((state) => state.user.email);
@@ -19,24 +20,38 @@ export default function Profile() {
 	const [addresses, setAddresses] = useState([]);
 	const navigate = useNavigate();
 
+	// useEffect(() => {
+	// 	axios.get(
+	// 		`http://localhost:8000/api/v2/user/profile?email=${email}`,
+	// 		{
+	// 			method: "GET",
+	// 			headers: {
+	// 				"Content-Type": "application/json",
+	// 			},
+	// 		}
+	// 	)
+	// 	.then((data) => {
+	// 		setPersonalDetails(data.user);
+	// 		setAddresses(data.addresses);
+	// 		console.log("User fetched:", data.user);
+	// 		console.log("Addresses fetched:", data.addresses);
+	// 		})
+	// 	.catch((err) => console.error(err));
+	// }, [email]);
+
 	useEffect(() => {
-		axios.get(
-			`http://localhost:8000/api/v2/user/profile?email=${email}`,
-			{
-				method: "GET",
-				headers: {
-					"Content-Type": "application/json",
-				},
-			}
-		)
-		.then((data) => {
-			setPersonalDetails(data.user);
-			setAddresses(data.addresses);
-			console.log("User fetched:", data.user);
-			console.log("Addresses fetched:", data.addresses);
-			})
-		.catch((err) => console.error(err));
-	}, [email]);
+        axios.get(`http://localhost:8000/api/v2/user/profile?email=${email}`)
+          .then((res) => {
+            const data = res.data;
+            setPersonalDetails(data.user);
+            setAddresses(data.addresses);
+            console.log("User fetched:", data.user);
+            console.log("Addresses fetched:", data.addresses);
+          })
+          .catch((err) => {
+            console.error("API error:", err);
+          });
+      }, [email]);
 
 	const handleAddAddress = () => {
 		navigate("/create-address");
