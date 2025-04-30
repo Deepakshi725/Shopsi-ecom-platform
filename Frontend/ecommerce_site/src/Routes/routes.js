@@ -12,7 +12,7 @@ import Cart from "../pages/cart.jsx";
 
 import ProductDetails from "../pages/productDetails.jsx";
 
-import Profile from "../pages/Profile.jsx";
+import Profile from "../pages/profile.jsx";
 
 import CreateAddress from "../pages/createAddress.jsx";
 
