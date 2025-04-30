@@ -40,7 +40,7 @@ export default function Profile() {
 	// }, [email]);
 
 	useEffect(() => {
-        axios.get(`http://localhost:8000/api/v2/user/profile?email=${email}`)
+        axios.get(`/api/v2/user/profile?email=${email}`)
           .then((res) => {
             const data = res.data;
             setPersonalDetails(data.user);

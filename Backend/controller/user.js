@@ -9,6 +9,7 @@ const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken"); // Import JSON Web Token
 require("dotenv").config();
+const { isAuthenticatedUser } = require('../middleware/auth');
 
 
 JWT_SECRET = "9f1e345b1a84a7c8d0b9e6f2e20dbb7e01c7aa40f7e3e2ad6e92750f60e4a2c9y"
@@ -24,8 +25,17 @@ router.post("/create-user", upload.single("file"), catchAsyncErrors(async (req, 
 
     const userEmail = await User.findOne({ email });
     if (userEmail) {
-        if (req.file) {
+        // if (req.file) {
             const filepath = path.join(__dirname, "../uploads", req.file.filename);
+        //     try {
+        //         fs.unlinkSync(filepath);
+        //     } catch (err) {
+        //         console.log("Error removing file:", err);
+        //         return res.status(500).json({ message: "Error removing file" });
+        //     }
+        // }
+
+        if (fs.existsSync(filepath)) {
             try {
                 fs.unlinkSync(filepath);
             } catch (err) {
@@ -91,10 +101,10 @@ router.post("/login-user", catchAsyncErrors(async (req, res, next) => {
         // Generate JWT token
         const token = jwt.sign(
             { id: user_authen._id, email: user_authen.email },
-            process.env.JWT_SECRET || "your_jwt_secret",
+            process.env.JWT_SECRET,
             { expiresIn: "1h" }
-        );
-    
+          );
+          
         // Set token in an HttpOnly cookie
         res.cookie("token", token, {
             httpOnly: true,

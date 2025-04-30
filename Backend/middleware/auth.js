@@ -1,4 +1,5 @@
 // backend/middleware/auth.js
+require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const User = require('../model/user');
 const ErrorHandler = require('../utils/ErrorHandler');
@@ -15,7 +16,7 @@ const isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
     let decodedData;
     try {
         // Verify token using your JWT secret
-        decodedData = jwt.verify(token, "randomtoken1234567890");
+        decodedData = jwt.verify(token, process.env.JWT_SECRET);
         console.log("Decoded data:", decodedData);
     } catch (err) {
         // If this block executes, jwt.verify() threw an error
