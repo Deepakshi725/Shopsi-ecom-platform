@@ -21,7 +21,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:8000/api/v2/user/login-user", { email, password });
+      const response = await axios.post("/api/v2/user/login-user", { email, password });
       console.log(response.data);
             // Dispatch action to store email in Redux state
             dispatch(setemail(email));

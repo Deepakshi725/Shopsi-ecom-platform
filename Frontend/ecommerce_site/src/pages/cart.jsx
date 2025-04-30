@@ -35,7 +35,7 @@ const Cart = () => {
         return;
       }
     
-      axios.get(`http://localhost:8000/api/v2/product/cartproducts?email=${email}`)
+      axios.get(`/api/v2/product/cartproducts?email=${email}`)
         .then((response) => {
           const cart = response.data.cart;
           if (Array.isArray(cart)) {
