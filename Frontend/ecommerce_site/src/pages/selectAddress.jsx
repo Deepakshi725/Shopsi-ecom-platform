@@ -19,7 +19,7 @@ const SelectAddress = () => {
 
             useEffect(() => {
                 if (!userEmail) return;
-                axios.get('http://localhost:8000/api/v2/user/addresses', { params: { email: userEmail } })
+                axios.get('/api/v2/user/addresses', { params: { email: userEmail } })
                     .then((res) => {
                         if (res.data && Array.isArray(res.data.addresses)) {
                             setAddresses(res.data.addresses);

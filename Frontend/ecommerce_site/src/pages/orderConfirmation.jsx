@@ -32,7 +32,7 @@ const OrderConfirmation = () => {
             try {
                 // 1) Fetch addresses
                 // Fetch selected address
-                const addressResponse = await axios.get('http://localhost:8000/api/v2/user/addresses', {
+                const addressResponse = await axios.get('/api/v2/user/addresses', {
                     params: { email: email },
                 });
 
@@ -49,7 +49,7 @@ const OrderConfirmation = () => {
 
                 // 2) Fetch cart
                 // Fetch cart products from /cartproducts endpoint
-                const cartResponse = await axios.get('http://localhost:8000/api/v2/product/cartproducts', {
+                const cartResponse = await axios.get('/api/v2/product/cartproducts', {
                     params: { email: email },
                 });
 
@@ -108,7 +108,7 @@ const OrderConfirmation = () => {
             };
 
             // Send POST request to place orders
-            const response = await axios.post('http://localhost:8000/api/v2/orders/place-order', payload);
+            const response = await axios.post('/api/v2/orders/place-order', payload);
             console.log('Orders placed successfully:', response.data);
 
             // Navigate to an order success page or display a success message

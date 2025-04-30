@@ -32,7 +32,7 @@ const CreateProduct = () => {
     useEffect(() => {
         if (isEdit) {
             axios
-                .get(`http://localhost:8000/api/v2/product/product/${id}`)
+                .get(`/api/v2/product/product/${id}`)
                 .then((response) => {
                     const p = response.data.product;
                     setName(p.name);

@@ -17,7 +17,7 @@ const MyOrdersPage = () => {
         try {
             setLoading(true);
             setError('');
-            const response = await axios.get('http://localhost:8000/api/v2/orders/my-orders', {
+            const response = await axios.get('/api/v2/orders/my-orders', {
                 params: { email },
             });
             setOrders(response.data.orders);
