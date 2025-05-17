@@ -19,37 +19,53 @@ export default function Home() {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    console.log('Home component mounted');
+    console.log('Current auth state:', { isAuthenticated, email });
+    
     // Check if user is authenticated
     const token = localStorage.getItem('token');
     const storedEmail = localStorage.getItem('email');
     
+    console.log('Local storage state:', { token: !!token, email: storedEmail });
+    
     if (!token || !storedEmail) {
+      console.log('No token or email found, redirecting to login');
       navigate('/');
       return;
     }
 
     // Verify authentication state matches localStorage
     if (!isAuthenticated || email !== storedEmail) {
+      console.log('Syncing auth state with localStorage');
       dispatch(setEmail(storedEmail));
       dispatch(setAuth(true));
     }
 
     const fetchProducts = async () => {
+      console.log('Fetching products...');
       try {
         const response = await axios.get(`${server}/api/v2/product/get-products`);
+        console.log('Products response:', response.data);
+        
         if (response.data && Array.isArray(response.data.products)) {
           setProducts(response.data.products);
         } else {
           throw new Error('Invalid response format');
         }
       } catch (err) {
-        console.error("❌ Error fetching products:", err);
+        console.error("❌ Error fetching products:", {
+          message: err.message,
+          response: err.response?.data,
+          status: err.response?.status
+        });
+        
         const errorMessage = err.response?.data?.message || err.message || 'Failed to fetch products';
         setError(errorMessage);
         toast.error(errorMessage);
         
         // If unauthorized, redirect to login
         if (err.response?.status === 401) {
+          console.log('Unauthorized, redirecting to login');
           navigate('/');
         }
       } finally {

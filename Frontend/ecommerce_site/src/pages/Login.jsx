@@ -23,6 +23,7 @@ const Login = () => {
     setIsLoading(true);
 
     try {
+      console.log('Attempting login...');
       const response = await axios.post(`${server}/api/v2/user/login-user`, {
         email,
         password
@@ -34,19 +35,41 @@ const Login = () => {
         }
       });
 
+      console.log('Login response:', response.data);
+
       if (response.data.success) {
-        localStorage.setItem('token', response.data.token);
+        // Store the token from the cookie
+        const token = response.data.token || response.headers['set-cookie']?.[0];
+        console.log('Token received:', token ? 'Yes' : 'No');
+        
+        if (token) {
+          localStorage.setItem('token', token);
+        }
         localStorage.setItem('email', email);
 
+        // Update Redux state
+        console.log('Updating Redux state...');
         dispatch(setEmail(email));
         dispatch(setAuth(true));
 
+        console.log('Login successful, navigating...');
         toast.success('Login successful!');
-        navigate('/login'); // Navigate to home page after successful login
+        navigate('/login'); // Navigate to home page
+      } else {
+        throw new Error('Login failed');
       }
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('Login error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
       toast.error(error.response?.data?.message || 'Login failed. Please check your credentials.');
+      // Clear any existing auth state on error
+      localStorage.removeItem('token');
+      localStorage.removeItem('email');
+      dispatch(setEmail(''));
+      dispatch(setAuth(false));
     } finally {
       setIsLoading(false);
     }
