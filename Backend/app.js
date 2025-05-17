@@ -30,7 +30,7 @@ app.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));
 
 // Configure CORS to allow requests from React frontend
 app.use(cors({
-    origin: 'https://ecom-code-along.vercel.app',
+    origin: '*',
     credentials: true 
   }));
 
