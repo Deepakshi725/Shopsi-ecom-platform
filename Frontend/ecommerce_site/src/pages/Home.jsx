@@ -7,7 +7,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { server } from "../server";
 import { useSelector, useDispatch } from "react-redux";
 import { toast } from "react-toastify";
-import { setEmail, setAuth } from "../redux/userSlice";
+import { setEmail, setAuth } from "../store/userSlice";
 
 export default function Home() {
   const [products, setProducts] = useState([]);
