@@ -23,12 +23,12 @@ export default function Home() {
     console.log('Current auth state:', { isAuthenticated, email });
     
     // Check if user is authenticated
-    const token = localStorage.getItem('token');
+ //   const token = localStorage.getItem('token');
     const storedEmail = localStorage.getItem('email');
     
-    console.log('Local storage state:', { token: !!token, email: storedEmail });
+  //  console.log('Local storage state:', { token: !!token, email: storedEmail });
     
-    if (!token || !storedEmail) {
+    if (!storedEmail) {
       console.log('No token or email found, redirecting to login');
       navigate('/');
       return;
