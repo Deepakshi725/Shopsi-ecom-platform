@@ -8,6 +8,8 @@ const fs = require('fs');
 
 const app = express();
 
+app.use(cookieParser()); 
+
 // Create upload directories if they don't exist
 const uploadsDir = path.join(__dirname, 'uploads');
 const productsDir = path.join(__dirname, 'products');

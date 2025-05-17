@@ -101,6 +101,7 @@ router.post("/login-user", catchAsyncErrors(async (req, res, next) => {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production", // use true in production
             sameSite: "Strict",
+            path: "/",
             maxAge: 3600000, // 1 hour
         });
 
