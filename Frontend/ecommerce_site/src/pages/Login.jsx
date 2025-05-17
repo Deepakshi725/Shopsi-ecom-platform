@@ -42,7 +42,7 @@ const Login = () => {
         dispatch(setAuth(true));
 
         toast.success('Login successful!');
-        navigate('/login'); // ✅ navigate to products page after login
+        navigate('/login'); // Navigate to home page after successful login
       }
     } catch (error) {
       console.error('Login error:', error);
