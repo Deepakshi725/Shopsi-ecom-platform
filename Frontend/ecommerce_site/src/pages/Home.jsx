@@ -5,8 +5,9 @@ import Nav from "../components/nav";
 import axios from "../axiosConfig";
 import { Link, useNavigate } from "react-router-dom";
 import { server } from "../server";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { toast } from "react-toastify";
+import { setEmail, setAuth } from "../redux/userSlice";
 
 export default function Home() {
   const [products, setProducts] = useState([]);
@@ -15,12 +16,22 @@ export default function Home() {
   const navigate = useNavigate();
   const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
   const email = useSelector((state) => state.user.email);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     // Check if user is authenticated
-    if (!isAuthenticated || !email) {
+    const token = localStorage.getItem('token');
+    const storedEmail = localStorage.getItem('email');
+    
+    if (!token || !storedEmail) {
       navigate('/');
       return;
+    }
+
+    // Verify authentication state matches localStorage
+    if (!isAuthenticated || email !== storedEmail) {
+      dispatch(setEmail(storedEmail));
+      dispatch(setAuth(true));
     }
 
     const fetchProducts = async () => {
@@ -36,13 +47,18 @@ export default function Home() {
         const errorMessage = err.response?.data?.message || err.message || 'Failed to fetch products';
         setError(errorMessage);
         toast.error(errorMessage);
+        
+        // If unauthorized, redirect to login
+        if (err.response?.status === 401) {
+          navigate('/');
+        }
       } finally {
         setLoading(false);
       }
     };
 
     fetchProducts();
-  }, [isAuthenticated, email, navigate]);
+  }, [isAuthenticated, email, navigate, dispatch]);
 
   if (loading) {
     return (

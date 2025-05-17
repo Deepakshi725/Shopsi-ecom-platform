@@ -11,23 +11,21 @@ const userSlice = createSlice({
     initialState,
     reducers: {
         setEmail: (state, action) => {
-            localStorage.setItem('email', action.payload);
             state.email = action.payload;
+            localStorage.setItem('email', action.payload);
         },
         setAuth: (state, action) => {
-            const isAuthenticated = action.payload;
-            if (isAuthenticated) {
-                localStorage.setItem('token', 'true');
-            } else {
+            state.isAuthenticated = action.payload;
+            if (!action.payload) {
                 localStorage.removeItem('token');
+                localStorage.removeItem('email');
             }
-            state.isAuthenticated = isAuthenticated;
         },
         logout: (state) => {
-            localStorage.removeItem('email');
-            localStorage.removeItem('token');
             state.email = '';
             state.isAuthenticated = false;
+            localStorage.removeItem('token');
+            localStorage.removeItem('email');
         },
     },
 });
