@@ -110,6 +110,7 @@ router.post("/login-user", catchAsyncErrors(async (req, res, next) => {
     user_authen.password = undefined; // Remove password from response
     res.status(200).json({
         success: true,
+        token,
         user_authen,
     });
 }));

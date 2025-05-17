@@ -1,4 +1,3 @@
-// backend/middleware/auth.js
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const User = require('../model/user');
