@@ -30,11 +30,9 @@ app.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));
 
 // Configure CORS to allow requests from React frontend
 app.use(cors({
-    origin: ['http://localhost:5173', 'https://ecom-code-along.vercel.app'],
-    credentials: true, // Enable if you need to send cookies or authentication headers
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
-}));
+    origin: 'https://ecom-code-along.vercel.app',
+    credentials: true 
+  }));
 
 // Serve static files BEFORE route handling
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
