@@ -11,29 +11,6 @@ import { server } from "../server";
 axios.defaults.withCredentials = true;
 
 
-// const Login = () => {
-//   const dispatch = useDispatch();
-//   const navigate = useNavigate(); // Initialize navigate
-//   const [email, setEmail] = useState("");
-//   const [password, setPassword] = useState("");
-//   const [visible, setVisible] = useState(false);
-//   const [isLoading, setIsLoading] = useState(false);
-
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   try {
-  //     const response = await axios.post(`${server}/api/v2/user/login-user`, { email, password });
-  //     console.log(response.data);
-      
-  //           // Dispatch action to store email in Redux state
-  //           dispatch(setEmail(email));
-  //           // Redirect to profile page after successful login
-  //           navigate("/");
-  //   } catch (error) {
-  //     console.error("There was an error logging in!", error);
-  //   }
-  // };
-
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -52,7 +29,7 @@ const Login = () => {
         email,
         password
       }, {
-        withCredentials: true,
+        withCredentials: true,  // Important to send cookies
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
@@ -62,15 +39,9 @@ const Login = () => {
       console.log('Login response:', response.data);
 
       if (response.data.success) {
-        // Store the token from the cookie
-        const token = response.data.token || response.headers['set-cookie']?.[0];
-        console.log('Token received:', token ? 'Yes' : 'No');
-        
-        if (token) {
-          localStorage.setItem('token', token);
-          console.log("Local storage token:", localStorage.getItem('token'));
+        // NO token from response or headers - token is stored in httpOnly cookie
 
-        }
+        // Store email in localStorage (optional, if you want persistence)
         localStorage.setItem('email', email);
 
         // Update Redux state
@@ -91,8 +62,8 @@ const Login = () => {
         status: error.response?.status
       });
       toast.error(error.response?.data?.message || 'Login failed. Please check your credentials.');
+      
       // Clear any existing auth state on error
-      localStorage.removeItem('token');
       localStorage.removeItem('email');
       dispatch(setEmail(''));
       dispatch(setAuth(false));
@@ -100,6 +71,7 @@ const Login = () => {
       setIsLoading(false);
     }
   };
+
 
   return (
     <div className="min-h-screen bg-[#222831] px-6 py-12">
