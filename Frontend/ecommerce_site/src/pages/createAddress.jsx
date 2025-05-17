@@ -104,7 +104,7 @@ const CreateAddress = () => {
         setLoading(true);
         try {
             const response = await axios.post(
-                `${server}/user/add-address`,
+                `${server}/api/v2/user/add-address`,
                 { ...formData, email },
                 {
                     headers: { "Content-Type": "application/json" },

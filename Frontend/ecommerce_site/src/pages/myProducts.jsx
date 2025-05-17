@@ -6,6 +6,7 @@ import axios from "../axiosConfig";
 import Nav from "../components/nav";
 import { Link } from "react-router-dom";
 import { FaPlus } from "react-icons/fa";
+import { server } from "../server";
 
 export default function MyProducts() {
     const [products, setProducts] = useState([]);
@@ -35,7 +36,7 @@ export default function MyProducts() {
     useEffect(() => {
         if (!email) return alert("error in display");
     
-        axios.get(`/api/v2/product/my-products?email=${email}`)
+        axios.get(`${server}/api/v2/product/my-products?email=${email}`)
             .then((res) => {
                 setProducts(res.data.products);
                 setLoading(false);

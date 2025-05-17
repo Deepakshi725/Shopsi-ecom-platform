@@ -57,7 +57,7 @@ export default function CartProduct({ _id, name, images = [], quantity = 1, pric
 		
 		setIsUpdating(true);
 		try {
-			const response = await axios.put(`${server}/product/cartproduct/quantity`, {
+			const response = await axios.put(`${server}/api/v2/product/cartproduct/quantity`, {
 				email,
 				productId: _id,
 				quantity: newQuantity,
@@ -88,7 +88,7 @@ export default function CartProduct({ _id, name, images = [], quantity = 1, pric
 		
 		setIsRemoving(true);
 		try {
-			const response = await axios.delete(`${server}/product/cartproduct/${email}/${_id}`);
+			const response = await axios.delete(`${server}/api/v2/product/cartproduct/${email}/${_id}`);
 			
 			if (response.data.message === 'Product removed from cart successfully') {
 				dispatch(removeCartItem(_id));

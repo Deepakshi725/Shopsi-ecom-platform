@@ -31,7 +31,7 @@ export default function Profile() {
 		}
 
 		setLoading(true);
-		axios.get(`${server}/user/profile?email=${email}`)
+		axios.get(`${server}/api/v2/user/profile?email=${email}`)
 			.then((res) => {
 				console.log("Profile response:", res.data);
 				const data = res.data;
@@ -93,7 +93,7 @@ export default function Profile() {
 			}
 
 			const response = await axios.put(
-				`${server}/user/update-profile?email=${email}`,
+				`${server}/api/v2/user/update-profile?email=${email}`,
 				formData,
 				{
 					headers: {

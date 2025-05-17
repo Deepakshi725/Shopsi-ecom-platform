@@ -24,7 +24,7 @@ const SelectAddress = () => {
 
     const fetchAddresses = async () => {
         try {
-            const res = await axios.get(`${server}/user/addresses`, { params: { email: userEmail } });
+            const res = await axios.get(`${server}/api/v2/user/addresses`, { params: { email: userEmail } });
             if (res.data && Array.isArray(res.data.addresses)) {
                 setAddresses(res.data.addresses);
                 // Set default address if available

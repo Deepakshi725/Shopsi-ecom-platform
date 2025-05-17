@@ -31,8 +31,8 @@ const OrderConfirmation = () => {
         const fetchData = async () => {
             try {
                 const [addressResponse, cartResponse] = await Promise.all([
-                    axios.get(`${server}/user/addresses`, { params: { email } }),
-                    axios.get(`${server}/product/cartproducts`, { params: { email } })
+                    axios.get(`${server}/api/v2/user/addresses`, { params: { email } }),
+                    axios.get(`${server}/api/v2/product/cartproducts`, { params: { email } })
                 ]);
 
                 if (addressResponse.status !== 200 || cartResponse.status !== 200) {
@@ -86,7 +86,7 @@ const OrderConfirmation = () => {
                 paypalOrderData,
             };
 
-            const response = await axios.post(`${server}/orders/place-order`, payload);
+            const response = await axios.post(`${server}/api/v2/orders/place-order`, payload);
             
             // Show success toast
             toast.success(

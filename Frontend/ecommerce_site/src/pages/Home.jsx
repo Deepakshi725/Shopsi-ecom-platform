@@ -13,7 +13,7 @@ export default function Home() {
 
   useEffect(() => {
     axios
-      .get(`${server}/product/get-products`)
+      .get(`${server}/api/v2/product/get-products`)
       .then((res) => {
         setProducts(res.data.products);
         setLoading(false);

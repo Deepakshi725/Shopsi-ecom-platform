@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
 import { useSelector } from 'react-redux'; // Import useSelector
 import axios from '../axiosConfig'; // <--- use your configured axios
+import { server } from '../server';
+
 
 const Cart = () => {
     const [products, setProducts] = useState([]);
@@ -18,7 +20,7 @@ const Cart = () => {
         }
 
         try {
-            const response = await axios.get(`/api/v2/product/cartproducts?email=${email}`);
+            const response = await axios.get(`${server}/api/v2/product/cartproducts?email=${email}`);
             const cart = response.data.cart;
             if (Array.isArray(cart)) {
                 const formattedProducts = cart.map(product => ({

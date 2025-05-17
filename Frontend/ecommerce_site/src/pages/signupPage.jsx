@@ -27,7 +27,7 @@ const SignupPage = () => {
     newForm.append("password", password);
 
     try {
-      const response = await axios.post(`${server}/user/create-user`, newForm, {
+      const response = await axios.post(`${server}/api/v2/user/create-user`, newForm, {
         headers: {
           "Content-Type": "multipart/form-data",
           "Accept": "any",

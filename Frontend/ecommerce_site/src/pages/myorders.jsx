@@ -44,7 +44,7 @@ const MyOrdersPage = () => {
         try {
             setLoading(true);
             setError('');
-            const response = await axios.get(`${server}/orders/my-orders`, {
+            const response = await axios.get(`${server}/api/v2/orders/my-orders`, {
                 params: { email },
             });
             setOrders(response.data.orders);
@@ -62,7 +62,7 @@ const MyOrdersPage = () => {
         }
 
         try {
-            const response = await axios.patch(`${server}/orders/cancel-order/${orderId}`);
+            const response = await axios.patch(`${server}/api/v2/orders/cancel-order/${orderId}`);
             
             if (response.data.message === 'Order cancelled successfully.') {
                 // Show success toast

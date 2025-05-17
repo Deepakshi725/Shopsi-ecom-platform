@@ -24,7 +24,7 @@ export default function ProductDetails() {
 	useEffect(() => {
 		const fetchProduct = async () => {
 			try {
-				const response = await axios.get(`${server}/product/product/${id}`);
+				const response = await axios.get(`${server}/api/v2/product/product/${id}`);
 				setProduct(response.data.product);
 			} catch (err) {
 				console.error("Error fetching product:", err);
@@ -54,7 +54,7 @@ export default function ProductDetails() {
 
 		setAddingToCart(true);
 		try {
-			const response = await axios.post(`${server}/product/cart`, {
+			const response = await axios.post(`${server}/api/v2/product/cart`, {
 				userId: email,
 				productId: id,
 				quantity: quantity,
