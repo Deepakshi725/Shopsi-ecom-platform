@@ -8,7 +8,7 @@ const isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
     const token = req.cookies.token;
     console.log("Token from cookies:", token);
 
-    if (!token) {
+    if (!isAuthenticated) {
         return next(new ErrorHandler("Please login to access this resource", 401));
     }
 
