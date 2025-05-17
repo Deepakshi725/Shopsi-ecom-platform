@@ -60,7 +60,6 @@ router.post("/create-user", upload.single("file"), catchAsyncErrors(async (req, 
 
 
 // 2) Login
-// In your login route (e.g., routes/user.js)
 router.post("/login-user", catchAsyncErrors(async (req, res, next) => {
     console.log("Logging in user...");
 
@@ -110,11 +109,9 @@ router.post("/login-user", catchAsyncErrors(async (req, res, next) => {
     user_authen.password = undefined; // Remove password from response
     res.status(200).json({
         success: true,
-        token,
         user_authen,
     });
 }));
-
 // 3) Get profile
 router.get("/profile", isAuthenticatedUser, catchAsyncErrors(async (req, res, next) => {
     const { email } = req.query;
