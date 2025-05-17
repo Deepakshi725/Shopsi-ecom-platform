@@ -10,7 +10,6 @@ import { server } from "../server";
 // Ensure axios sends cookies with requests
 axios.defaults.withCredentials = true;
 
-
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -29,7 +28,7 @@ const Login = () => {
         email,
         password
       }, {
-        withCredentials: true,  // Important to send cookies
+        withCredentials: true,
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
@@ -39,19 +38,13 @@ const Login = () => {
       console.log('Login response:', response.data);
 
       if (response.data.success) {
-        // NO token from response or headers - token is stored in httpOnly cookie
-
-        // Store email in localStorage (optional, if you want persistence)
-        localStorage.setItem('email', email);
-
-        // Update Redux state
         console.log('Updating Redux state...');
-        dispatch(setEmail(email));
+        dispatch(setEmail(response.data.user_authen.email));
         dispatch(setAuth(true));
 
-        console.log('Login successful, navigating...');
         toast.success('Login successful!');
-        navigate('/login'); // Navigate to home page
+        console.log('Login successful, navigating...');
+        navigate('/login');  // ✅ Redirect to home or dashboard
       } else {
         throw new Error('Login failed');
       }
@@ -62,16 +55,14 @@ const Login = () => {
         status: error.response?.status
       });
       toast.error(error.response?.data?.message || 'Login failed. Please check your credentials.');
-      
-      // Clear any existing auth state on error
-      localStorage.removeItem('email');
+
+      // Reset Redux state
       dispatch(setEmail(''));
       dispatch(setAuth(false));
     } finally {
       setIsLoading(false);
     }
   };
-
 
   return (
     <div className="min-h-screen bg-[#222831] px-6 py-12">
