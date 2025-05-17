@@ -14,6 +14,12 @@ export default {
         "1300px": "1300px",
         "400px": "400px",
       },
+      colors: {
+        darkBlueGray: '#222831',
+        darkGray: '#31363F',
+        lightTeal: '#76ABAE',
+        lightGray: '#EEEEEE',
+      },
     },
   },
   plugins: [],

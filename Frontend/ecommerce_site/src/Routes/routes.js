@@ -6,7 +6,7 @@ import Home from "../pages/Home.jsx";
 
 import CreateProduct from "../pages/createProduct.jsx";
 
-import MyProducts from "../pages/myProduct.jsx";
+import MyProducts from "../pages/myProducts.jsx";
 
 import Cart from "../pages/cart.jsx";
 

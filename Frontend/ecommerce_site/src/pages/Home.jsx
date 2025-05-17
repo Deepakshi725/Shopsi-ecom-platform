@@ -1,8 +1,10 @@
-//eslint-disable-next-line
+// eslint-disable-next-line
 import React, { useEffect, useState } from "react";
 import Product from "../components/products";
 import Nav from "../components/nav";
 import axios from "../axiosConfig";
+import { Link } from "react-router-dom";
+import {server} from "../server";
 
 export default function Home() {
   const [products, setProducts] = useState([]);
@@ -11,7 +13,7 @@ export default function Home() {
 
   useEffect(() => {
     axios
-      .get("/api/v2/product/get-products")
+      .get(`${server}/product/get-products`)
       .then((res) => {
         setProducts(res.data.products);
         setLoading(false);
@@ -24,24 +26,34 @@ export default function Home() {
   }, []);
 
   if (loading) {
-    return <div className="text-center text-white mt-10">Loading products...</div>;
+    return (
+      <div className="min-h-screen bg-[#222831] flex items-center justify-center">
+        <p className="text-[#EEEEEE] text-xl">Loading products...</p>
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="text-center text-red-500 mt-10">Error: {error}</div>;
+    return (
+      <div className="min-h-screen bg-[#222831] flex items-center justify-center">
+        <p className="text-red-400 text-xl">Error: {error}</p>
+      </div>
+    );
   }
 
   return (
     <>
       <Nav />
-    <div className="min-h-screen bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-12 flex flex-col justify-center sm:px-6 lg:px-8">
-      <h1 className="text-3xl text-center text-white py-6">Product Gallery</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 p-4">
-        {products.map((product) => (
-          <Product key={product._id} {...product} />
-        ))}
+      <div className="min-h-screen bg-[#222831] px-6 py-12 flex flex-col justify-center sm:px-6 lg:px-10">
+        <h1 className="text-3xl sm:text-4xl font-bold text-center text-[#EEEEEE] py-6">
+          Product Gallery
+        </h1>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+          {products.map((product) => (
+            <Product key={product._id} {...product} />
+          ))}
+        </div>
       </div>
-    </div>
     </>
   );
 }

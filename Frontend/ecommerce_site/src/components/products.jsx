@@ -1,12 +1,11 @@
 //eslint-disable-next-line
 import React, { useState, useEffect } from "react";
-import PropTypes from "prop-types"; // Import PropTypes
+import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 
 export default function Product({ _id, name, images, description, price }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const navigate = useNavigate();
-
 
   useEffect(() => {
     if (!images || images.length === 0) return;
@@ -20,21 +19,29 @@ export default function Product({ _id, name, images, description, price }) {
   //const currentImage = images[currentIndex];
   const currentImage = images.length > 0 ? images[currentIndex] : null;
   console.log(currentImage);
+
   return (
-    <div className="bg-neutral-200 p-4 rounded-lg shadow-md flex flex-col justify-between">
-      <div className="w-full ">
-        <img
-          src={`http://localhost:8000${currentImage}`} // Ensure the URL is correct\
-          alt={name}
-          className="w-full h-56 object-cover rounded-lg mb-2"
-        />
-        <h2 className="text-lg font-bold">{name}</h2>
-        <p className="text-sm opacity-75 mt-2">{description}</p>
+    <div className="bg-[#31363F] p-4 rounded-xl shadow-lg text-[#EEEEEE] hover:shadow-xl transition duration-300 flex flex-col justify-between">
+      <div className="w-full">
+        {currentImage && (
+          <img
+            src={`http://localhost:8000${currentImage}`}
+            alt={name}
+            className="w-full h-56 object-cover rounded-md mb-3 border-2 border-[#222831]"
+          />
+        )}
+        <h2 className="text-xl font-bold mb-1">{name}</h2>
+        <p className="text-sm opacity-90 mb-2">{description}</p>
       </div>
-      <div className="w-full mt-4">
-        <p className="text-lg font-bold my-2">${price.toFixed(2)}</p>
-        <button className="w-full text-white px-4 py-2 rounded-md bg-neutral-900 hover:bg-neutral-700 transition duration-300" 
-         onClick={() => navigate(`/product/${_id}`)}>
+
+      <div className="w-full mt-2">
+        <p className="text-lg font-semibold text-[#76ABAE] mb-3">
+          ${price.toFixed(2)}
+        </p>
+        <button
+          className="w-full text-[#EEEEEE] bg-[#222831] hover:bg-[#76ABAE] hover:text-[#222831] px-4 py-2 rounded-md font-semibold transition duration-300"
+          onClick={() => navigate(`/product/${_id}`)}
+        >
           More Info
         </button>
       </div>
@@ -43,9 +50,9 @@ export default function Product({ _id, name, images, description, price }) {
 }
 
 Product.propTypes = {
-  _id: PropTypes.string.isRequired, 
-  name: PropTypes.string.isRequired, // Ensure name is a required string
-  images: PropTypes.arrayOf(PropTypes.string).isRequired, // Ensure images is an array of strings
-  description: PropTypes.string.isRequired, // Ensure description is a required string
-  price: PropTypes.number.isRequired, // Ensure price is a required number
+  _id: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
+  images: PropTypes.arrayOf(PropTypes.string).isRequired,
+  description: PropTypes.string.isRequired,
+  price: PropTypes.number.isRequired,
 };
