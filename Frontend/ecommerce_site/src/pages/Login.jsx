@@ -67,7 +67,9 @@ const Login = () => {
         console.log('Token received:', token ? 'Yes' : 'No');
         
         if (token) {
-          localStorage.setItem('token', res.data.token);
+          localStorage.setItem('token', token);
+          console.log("Local storage token:", localStorage.getItem('token'));
+
         }
         localStorage.setItem('email', email);
 
