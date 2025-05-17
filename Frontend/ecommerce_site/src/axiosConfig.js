@@ -1,7 +1,8 @@
 import axios from 'axios';
+import { server } from './server';
 
 const instance = axios.create({
-    baseURL: 'http://localhost:8000', // your server
+    baseURL: server,
     withCredentials: true,            // crucial for sending cookies
 });
 

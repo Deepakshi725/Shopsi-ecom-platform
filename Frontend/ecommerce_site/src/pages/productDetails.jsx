@@ -163,10 +163,9 @@ export default function ProductDetails() {
 							<div className="relative">
 							{product.images && product.images.length > 0 ? (
 								<img
-									src={`http://localhost:8000${product.images[0]}`}
+									src={`${server}${product.images[0]}`}
 									alt={product.name}
-									className="w-full h-full object-contain bsm:object-cover"
-									style={{ maxHeight: "500px" }} // Adjust the max height as needed
+									className="w-full h-full object-cover"
 								/>
 
 								) : (
