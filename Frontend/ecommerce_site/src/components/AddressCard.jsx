@@ -35,7 +35,7 @@ export default function AddressCard({
 
 		setIsDeleting(true);
 		try {
-			await axios.delete(`${server}/user/delete-address/${_id}`, {
+			await axios.delete(`${server}/api/v2/user/delete-address/${_id}`, {
 				params: { email }
 			});
 			if (onDelete) {
