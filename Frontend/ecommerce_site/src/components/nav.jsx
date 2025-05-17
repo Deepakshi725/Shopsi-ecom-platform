@@ -1,4 +1,4 @@
-//eslint-disable-next-line
+// eslint-disable-next-line
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 
@@ -10,7 +10,7 @@ const NavBar = () => {
     };
 
     return (
-        <nav className=" bg-gradient-to-r from-blue-500 to-purple-600">
+        <nav className="bg-[#222831] shadow-md sticky top-0 z-50 ">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between h-16">
                     {/* Hamburger Menu Button (visible on mobile) */}
@@ -18,7 +18,7 @@ const NavBar = () => {
                         <button
                             onClick={toggleMenu}
                             type="button"
-                            className="text-gray-200 hover:text-white focus:outline-none focus:text-white"
+                            className="text-[#EEEEEE] hover:text-[#76ABAE] focus:outline-none focus:text-white"
                             aria-controls="mobile-menu"
                             aria-expanded={isOpen}
                         >
@@ -39,7 +39,6 @@ const NavBar = () => {
                                     />
                                 </svg>
                             ) : (
-                                // Close Icon
                                 <svg
                                     className="h-6 w-6"
                                     xmlns="http://www.w3.org/2000/svg"
@@ -58,16 +57,17 @@ const NavBar = () => {
                         </button>
                     </div>
 
+                    {/* Desktop Menu */}
                     <div className="hidden md:flex md:items-center md:justify-center w-full">
                         <ul className="flex space-x-6">
                             <li>
                                 <NavLink
-                                    to="/"
+                                    to="/login"
                                     end
                                     className={({ isActive }) =>
                                         isActive
                                             ? "text-white font-semibold px-3 py-2 rounded-md text-sm transition-colors duration-200"
-                                            : "text-gray-200 hover:text-white px-3 py-2 rounded-md text-sm transition-colors duration-200"
+                                            : "text-[#EEEEEE] hover:text-[#76ABAE] px-3 py-2 rounded-md text-sm transition-colors duration-200"
                                     }
                                 >
                                     Home
@@ -79,7 +79,7 @@ const NavBar = () => {
                                     className={({ isActive }) =>
                                         isActive
                                             ? "text-white font-semibold px-3 py-2 rounded-md text-sm transition-colors duration-200"
-                                            : "text-gray-200 hover:text-white px-3 py-2 rounded-md text-sm transition-colors duration-200"
+                                            : "text-[#EEEEEE] hover:text-[#76ABAE] px-3 py-2 rounded-md text-sm transition-colors duration-200"
                                     }
                                 >
                                     My Products
@@ -91,7 +91,7 @@ const NavBar = () => {
                                     className={({ isActive }) =>
                                         isActive
                                             ? "text-white font-semibold px-3 py-2 rounded-md text-sm transition-colors duration-200"
-                                            : "text-gray-200 hover:text-white px-3 py-2 rounded-md text-sm transition-colors duration-200"
+                                            : "text-[#EEEEEE] hover:text-[#76ABAE] px-3 py-2 rounded-md text-sm transition-colors duration-200"
                                     }
                                 >
                                     Add Products
@@ -103,42 +103,36 @@ const NavBar = () => {
                                     className={({ isActive }) =>
                                         isActive
                                             ? "text-white font-semibold px-3 py-2 rounded-md text-sm transition-colors duration-200"
-                                            : "text-gray-200 hover:text-white px-3 py-2 rounded-md text-sm transition-colors duration-200"
+                                            : "text-[#EEEEEE] hover:text-[#76ABAE] px-3 py-2 rounded-md text-sm transition-colors duration-200"
                                     }
                                 >
                                     Cart
                                 </NavLink>
                             </li>
-    
-                    {/*Add this new code*/}
-
-                             <li>
+                            <li>
                                 <NavLink
                                     to="/profile"
                                     className={({ isActive }) =>
                                         isActive
                                             ? "text-white font-semibold px-3 py-2 rounded-md text-sm transition-colors duration-200"
-                                            : "text-gray-200 hover:text-white px-3 py-2 rounded-md text-sm transition-colors duration-200"
+                                            : "text-[#EEEEEE] hover:text-[#76ABAE] px-3 py-2 rounded-md text-sm transition-colors duration-200"
                                     }
                                 >
                                     Profile
                                 </NavLink>
                             </li>
-                                    {/*      milestone_27   */}
                             <li>
                                 <NavLink
                                     to="/myorders"
                                     className={({ isActive }) =>
                                         isActive
                                             ? "text-white font-semibold px-3 py-2 rounded-md text-sm transition-colors duration-200"
-                                            : "text-gray-200 hover:text-white px-3 py-2 rounded-md text-sm transition-colors duration-200"
+                                            : "text-[#EEEEEE] hover:text-[#76ABAE] px-3 py-2 rounded-md text-sm transition-colors duration-200"
                                     }
                                 >
                                     My Orders
                                 </NavLink>
                             </li>
-
-
                         </ul>
                     </div>
                 </div>
@@ -150,12 +144,12 @@ const NavBar = () => {
                     <ul className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
                         <li>
                             <NavLink
-                                to="/"
+                                to="/login"
                                 end
                                 className={({ isActive }) =>
                                     isActive
                                         ? "block text-white font-semibold px-3 py-2 rounded-md text-base transition-colors duration-200"
-                                        : "block text-gray-200 hover:text-white px-3 py-2 rounded-md text-base transition-colors duration-200"
+                                        : "block text-[#EEEEEE] hover:text-[#76ABAE] px-3 py-2 rounded-md text-base transition-colors duration-200"
                                 }
                                 onClick={() => setIsOpen(false)} // Close menu on link click
                             >
@@ -168,7 +162,7 @@ const NavBar = () => {
                                 className={({ isActive }) =>
                                     isActive
                                         ? "block text-white font-semibold px-3 py-2 rounded-md text-base transition-colors duration-200"
-                                        : "block text-gray-200 hover:text-white px-3 py-2 rounded-md text-base transition-colors duration-200"
+                                        : "block text-[#EEEEEE] hover:text-[#76ABAE] px-3 py-2 rounded-md text-base transition-colors duration-200"
                                 }
                                 onClick={() => setIsOpen(false)}
                             >
@@ -177,11 +171,11 @@ const NavBar = () => {
                         </li>
                         <li>
                             <NavLink
-                                to="/addproducts"
+                                to="/create-product"
                                 className={({ isActive }) =>
                                     isActive
                                         ? "block text-white font-semibold px-3 py-2 rounded-md text-base transition-colors duration-200"
-                                        : "block text-gray-200 hover:text-white px-3 py-2 rounded-md text-base transition-colors duration-200"
+                                        : "block text-[#EEEEEE] hover:text-[#76ABAE] px-3 py-2 rounded-md text-base transition-colors duration-200"
                                 }
                                 onClick={() => setIsOpen(false)}
                             >
@@ -194,47 +188,39 @@ const NavBar = () => {
                                 className={({ isActive }) =>
                                     isActive
                                         ? "block text-white font-semibold px-3 py-2 rounded-md text-base transition-colors duration-200"
-                                        : "block text-gray-200 hover:text-white px-3 py-2 rounded-md text-base transition-colors duration-200"
+                                        : "block text-[#EEEEEE] hover:text-[#76ABAE] px-3 py-2 rounded-md text-base transition-colors duration-200"
                                 }
                                 onClick={() => setIsOpen(false)}
                             >
                                 Cart
                             </NavLink>
                         </li>
-
-                        {/*Add this new code*/}
-                        
                         <li>
                             <NavLink
                                 to="/profile"
                                 className={({ isActive }) =>
                                     isActive
                                         ? "block text-white font-semibold px-3 py-2 rounded-md text-base transition-colors duration-200"
-                                        : "block text-gray-200 hover:text-white px-3 py-2 rounded-md text-base transition-colors duration-200"
+                                        : "block text-[#EEEEEE] hover:text-[#76ABAE] px-3 py-2 rounded-md text-base transition-colors duration-200"
                                 }
                                 onClick={() => setIsOpen(false)}
                             >
                                 Profile
                             </NavLink>
                         </li>
-
-                                  {/*      milestone_27   */}
-                                  
                         <li>
                             <NavLink
                                 to="/myorders"
                                 className={({ isActive }) =>
                                     isActive
                                         ? "block text-white font-semibold px-3 py-2 rounded-md text-base transition-colors duration-200"
-                                        : "block text-gray-200 hover:text-white px-3 py-2 rounded-md text-base transition-colors duration-200"
+                                        : "block text-[#EEEEEE] hover:text-[#76ABAE] px-3 py-2 rounded-md text-base transition-colors duration-200"
                                 }
                                 onClick={() => setIsOpen(false)}
                             >
                                 My Orders
                             </NavLink>
                         </li>
-                        
-
                     </ul>
                 </div>
             )}

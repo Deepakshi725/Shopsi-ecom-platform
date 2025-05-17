@@ -1,16 +1,15 @@
 //eslint-disable-next-line
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { AiOutlinePlusCircle } from "react-icons/ai";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "../axiosConfig";
 import Nav from "../components/nav";
+import { server } from '../server';
 
 const CreateProduct = () => {
-
     const { id } = useParams();
     const navigate = useNavigate();
     const isEdit = Boolean(id);
-
 
     const [images, setImages] = useState([]);
     const [previewImages, setPreviewImages] = useState([]);
@@ -32,7 +31,7 @@ const CreateProduct = () => {
     useEffect(() => {
         if (isEdit) {
             axios
-                .get(`/api/v2/product/product/${id}`)
+                .get(`http://localhost:8000/api/v2/product/product/${id}`)
                 .then((response) => {
                     const p = response.data.product;
                     setName(p.name);
@@ -137,137 +136,187 @@ const CreateProduct = () => {
 
     return (
         <>
-        <Nav />
-        <div className="min-h-screen bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-12 flex flex-col justify-center sm:px-6 lg:px-8">
-        <div className="w-[90%] max-w-[600px] bg-white shadow h-auto rounded-[4px] p-4 mx-auto">
-            <h5 className="mt-6 text-center text-3xl font-bold text-gray-900">Create Product</h5>
-            <form onSubmit={handleSubmit}>
-                <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700">
-                        Email <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                        type="email"
-                        value={email}
-                        className="w-full p-2 border rounded"
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="Enter your email"
-                        required
-                    />
+            <Nav />
+            <div className="min-h-screen bg-[#222831] px-6 py-12">
+                <div className="max-w-3xl mx-auto">
+                    <h2 className="text-3xl font-bold text-center text-[#EEEEEE] mb-8">
+                        {isEdit ? "Edit Product" : "Create New Product"}
+                    </h2>
+                    
+                    <form onSubmit={handleSubmit} className="bg-[#31363F] rounded-xl shadow-lg p-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {/* Email Field */}
+                            <div className="col-span-2">
+                                <label className="block text-[#EEEEEE] text-sm font-medium mb-2">
+                                    Email <span className="text-red-400">*</span>
+                                </label>
+                                <input
+                                    type="email"
+                                    value={email}
+                                    className="w-full p-3 bg-[#222831] border border-[#76ABAE] rounded-lg text-[#EEEEEE] focus:outline-none focus:ring-2 focus:ring-[#76ABAE]"
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    placeholder="Enter your email"
+                                    required
+                                />
+                            </div>
+
+                            {/* Name Field */}
+                            <div className="col-span-2">
+                                <label className="block text-[#EEEEEE] text-sm font-medium mb-2">
+                                    Product Name <span className="text-red-400">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    value={name}
+                                    className="w-full p-3 bg-[#222831] border border-[#76ABAE] rounded-lg text-[#EEEEEE] focus:outline-none focus:ring-2 focus:ring-[#76ABAE]"
+                                    onChange={(e) => setName(e.target.value)}
+                                    placeholder="Enter product name"
+                                    required
+                                />
+                            </div>
+
+                            {/* Description Field */}
+                            <div className="col-span-2">
+                                <label className="block text-[#EEEEEE] text-sm font-medium mb-2">
+                                    Description <span className="text-red-400">*</span>
+                                </label>
+                                <textarea
+                                    value={description}
+                                    className="w-full p-3 bg-[#222831] border border-[#76ABAE] rounded-lg text-[#EEEEEE] focus:outline-none focus:ring-2 focus:ring-[#76ABAE]"
+                                    onChange={(e) => setDescription(e.target.value)}
+                                    placeholder="Enter product description"
+                                    rows="4"
+                                    required
+                                ></textarea>
+                            </div>
+
+                            {/* Category Field */}
+                            <div>
+                                <label className="block text-[#EEEEEE] text-sm font-medium mb-2">
+                                    Category <span className="text-red-400">*</span>
+                                </label>
+                                <select
+                                    className="w-full p-3 bg-[#222831] border border-[#76ABAE] rounded-lg text-[#EEEEEE] focus:outline-none focus:ring-2 focus:ring-[#76ABAE]"
+                                    value={category}
+                                    onChange={(e) => setCategory(e.target.value)}
+                                    required
+                                >
+                                    <option value="">Choose a category</option>
+                                    {categoriesData.map((i) => (
+                                        <option value={i.title} key={i.title}>
+                                            {i.title}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            {/* Tags Field */}
+                            <div>
+                                <label className="block text-[#EEEEEE] text-sm font-medium mb-2">
+                                    Tags
+                                </label>
+                                <input
+                                    type="text"
+                                    value={tags}
+                                    className="w-full p-3 bg-[#222831] border border-[#76ABAE] rounded-lg text-[#EEEEEE] focus:outline-none focus:ring-2 focus:ring-[#76ABAE]"
+                                    onChange={(e) => setTags(e.target.value)}
+                                    placeholder="Enter tags (comma separated)"
+                                />
+                            </div>
+
+                            {/* Price Field */}
+                            <div>
+                                <label className="block text-[#EEEEEE] text-sm font-medium mb-2">
+                                    Price <span className="text-red-400">*</span>
+                                </label>
+                                <input
+                                    type="number"
+                                    value={price}
+                                    className="w-full p-3 bg-[#222831] border border-[#76ABAE] rounded-lg text-[#EEEEEE] focus:outline-none focus:ring-2 focus:ring-[#76ABAE]"
+                                    onChange={(e) => setPrice(e.target.value)}
+                                    placeholder="Enter price"
+                                    required
+                                />
+                            </div>
+
+                            {/* Stock Field */}
+                            <div>
+                                <label className="block text-[#EEEEEE] text-sm font-medium mb-2">
+                                    Stock <span className="text-red-400">*</span>
+                                </label>
+                                <input
+                                    type="number"
+                                    value={stock}
+                                    className="w-full p-3 bg-[#222831] border border-[#76ABAE] rounded-lg text-[#EEEEEE] focus:outline-none focus:ring-2 focus:ring-[#76ABAE]"
+                                    onChange={(e) => setStock(e.target.value)}
+                                    placeholder="Enter stock quantity"
+                                    required
+                                />
+                            </div>
+
+                            {/* Image Upload Field */}
+                            <div className="col-span-2">
+                                <label className="block text-[#EEEEEE] text-sm font-medium mb-2">
+                                    Product Images <span className="text-red-400">*</span>
+                                </label>
+                                <div className="mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-[#76ABAE] border-dashed rounded-lg">
+                                    <div className="space-y-1 text-center">
+                                        <AiOutlinePlusCircle className="mx-auto h-12 w-12 text-[#76ABAE]" />
+                                        <div className="flex text-sm text-[#EEEEEE]">
+                                            <label
+                                                htmlFor="file-upload"
+                                                className="relative cursor-pointer rounded-md font-medium text-[#76ABAE] hover:text-[#5b8d90] focus-within:outline-none"
+                                            >
+                                                <span>Upload images</span>
+                                                <input
+                                                    id="file-upload"
+                                                    name="file-upload"
+                                                    type="file"
+                                                    className="sr-only"
+                                                    multiple
+                                                    onChange={handleImagesChange}
+                                                    required={!isEdit}
+                                                />
+                                            </label>
+                                            <p className="pl-1">or drag and drop</p>
+                                        </div>
+                                        <p className="text-xs text-[#EEEEEE]">
+                                            PNG, JPG, GIF up to 10MB
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Image Previews */}
+                            {previewImages.length > 0 && (
+                                <div className="col-span-2">
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                                        {previewImages.map((url, index) => (
+                                            <div key={index} className="relative">
+                                                <img
+                                                    src={url}
+                                                    alt={`Preview ${index + 1}`}
+                                                    className="h-24 w-24 object-cover rounded-lg"
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Submit Button */}
+                        <div className="mt-8 flex justify-center">
+                            <button
+                                type="submit"
+                                className="bg-[#76ABAE] hover:bg-[#5b8d90] text-white font-semibold py-3 px-8 rounded-xl shadow-md transition-all text-lg"
+                            >
+                                {isEdit ? "Update Product" : "Create Product"}
+                            </button>
+                        </div>
+                    </form>
                 </div>
-                <div>
-                <label className="block text-sm font-medium text-gray-700">
-                        Name <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                        type="text"
-                        value={name}
-                        className="w-full p-2 border rounded"
-                        onChange={(e) => setName(e.target.value)}
-                        placeholder="Enter product name"
-                        required
-                    />
-                </div>
-                <div className="mt-4">
-                <label className="block text-sm font-medium text-gray-700">
-                        Description <span className="text-red-500">*</span>
-                    </label>
-                    <textarea
-                        value={description}
-                        className="w-full p-2 border rounded"
-                        onChange={(e) => setDescription(e.target.value)}
-                        placeholder="Enter product description"
-                        rows="4"
-                        required
-                    ></textarea>
-                </div>
-                <div className="mt-4">
-                <label className="block text-sm font-medium text-gray-700">
-                        Category <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                        className="w-full p-2 border rounded"
-                        value={category}
-                        onChange={(e) => setCategory(e.target.value)}
-                        required
-                    >
-                        <option className="block text-sm font-medium text-gray-700" value="">Choose a category</option>
-                        {categoriesData.map((i) => (
-                            <option value={i.title} key={i.title}>
-                                {i.title}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-                <div className="mt-4">
-                <label className="block text-sm font-medium text-gray-700">Tags</label>
-                    <input
-                        type="text"
-                        value={tags}
-                        className="w-full p-2 border rounded"
-                        onChange={(e) => setTags(e.target.value)}
-                        placeholder="Enter product tags"
-                    />
-                </div>
-                <div className="mt-4">
-                <label className="block text-sm font-medium text-gray-700">
-                        Price <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                        type="number"
-                        value={price}
-                        className="w-full p-2 border rounded"
-                        onChange={(e) => setPrice(e.target.value)}
-                        placeholder="Enter product price"
-                        required
-                    />
-                </div>
-                <div className="mt-4">
-                <label className="block text-sm font-medium text-gray-700">
-                        Stock <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                        type="number"
-                        value={stock}
-                        className="w-full p-2 border rounded"
-                        onChange={(e) => setStock(e.target.value)}
-                        placeholder="Enter stock quantity"
-                        required
-                    />
-                </div>
-                <div className="mt-4">
-                <label className="block text-sm font-medium text-gray-700 p-1">
-                        Upload Images <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                        type="file"
-                        id="upload"
-                        className="hidden"
-                        multiple
-                        onChange={handleImagesChange} // Corrected handler name
-                    />
-                    <label htmlFor="upload" className="cursor-pointer p-2">
-                        <AiOutlinePlusCircle size={20} color="#555" />
-                    </label>
-                    <div className="flex flex-wrap mt-2">
-                        {previewImages.map((img, index) => ( // Using previewImages
-                            <img
-                                src={img}
-                                key={index}
-                                alt="Preview"
-                                className="w-[100px] h-[100px] object-cover m-2"
-                            />
-                        ))}
-                    </div>
-                </div>
-                <button
-                    type="submit"
-                    className="w-full mt-4 bg-blue-500 text-white p-2 rounded"
-                >
-                {isEdit ? "Save Changes" : "Create"}
-                </button>
-            </form>
-        </div></div>
+            </div>
         </>
     );
 };

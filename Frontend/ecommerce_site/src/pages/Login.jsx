@@ -1,142 +1,145 @@
-//eslint-disable-next-line
-import { React, useState } from "react";
+import React, { useState } from "react";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-import styles from "../styles/style";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useDispatch } from 'react-redux';
-import { setemail } from "../store/userActions";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { setEmail, setAuth } from '../store/userSlice';
+import { toast } from 'react-toastify';
+import { server } from "../server";
 
 // Ensure axios sends cookies with requests
 axios.defaults.withCredentials = true;
 
 const Login = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate(); // Initialize navigate
-  const [email, setEmail] = useState("");
+  const navigate = useNavigate();
+  const [email, setEmailInput] = useState("");
   const [password, setPassword] = useState("");
   const [visible, setVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+
     try {
-      const response = await axios.post("/api/v2/user/login-user", { email, password });
-      console.log(response.data);
-            // Dispatch action to store email in Redux state
-            dispatch(setemail(email));
-            // Redirect to profile page after successful login
-            navigate("/");
+      const response = await axios.post(`${server}/user/login-user`, {
+        email,
+        password
+      });
+
+      if (response.data.success) {
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('email', email);
+
+        dispatch(setEmail(email));
+        dispatch(setAuth(true));
+
+        toast.success('Login successful!');
+        navigate('/login'); // ✅ navigate to products page after login
+      }
     } catch (error) {
-      console.error("There was an error logging in!", error);
+      console.error('Login error:', error);
+      toast.error(error.response?.data?.message || 'Login failed');
+    } finally {
+      setIsLoading(false);
     }
   };
 
-
   return (
-    <div className="min-h-screen bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-12 flex flex-col justify-center sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
-          Login to your account
+    <div className="min-h-screen bg-[#222831] px-6 py-12">
+      <div className="max-w-md mx-auto">
+        <h2 className="text-3xl font-bold text-center text-[#EEEEEE] mb-8">
+          Welcome Back
         </h2>
-      </div>
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          <form className="space-y-6" onSubmit={handleSubmit}>
+
+        <form onSubmit={handleSubmit} className="bg-[#31363F] rounded-xl shadow-lg p-8">
+          <div className="space-y-6">
+            {/* Email Field */}
             <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Email address
+              <label className="block text-[#EEEEEE] text-sm font-medium mb-2">
+                Email <span className="text-red-400">*</span>
               </label>
-              <div className="mt-1">
-                <input type="email"
-                  name="email"
-                  autoComplete="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                />
-              </div>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmailInput(e.target.value)}
+                required
+                className="w-full p-3 bg-[#222831] border border-[#76ABAE] rounded-lg text-[#EEEEEE] focus:outline-none focus:ring-2 focus:ring-[#76ABAE]"
+                placeholder="Enter your email"
+              />
             </div>
 
+            {/* Password Field */}
             <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Password
+              <label className="block text-[#EEEEEE] text-sm font-medium mb-2">
+                Password <span className="text-red-400">*</span>
               </label>
-              <div className="mt-1 relative">
-                <input   type={visible ? "text" : "password"}
-                  name="password"
-                  autoComplete="current-password"
-                  required
+              <div className="relative">
+                <input
+                  type={visible ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  required
+                  className="w-full p-3 bg-[#222831] border border-[#76ABAE] rounded-lg text-[#EEEEEE] pr-10 focus:outline-none focus:ring-2 focus:ring-[#76ABAE]"
+                  placeholder="Enter your password"
                 />
-                  {visible ? (
+                {visible ? (
                   <AiOutlineEye
-                    className="absolute right-2 top-2 cursor-pointer"
-                    size={25}
+                    className="absolute top-3.5 right-3 text-[#76ABAE] cursor-pointer hover:text-[#5b8d90]"
                     onClick={() => setVisible(false)}
                   />
                 ) : (
                   <AiOutlineEyeInvisible
-                    className="absolute right-2 top-2 cursor-pointer"
-                    size={25}
+                    className="absolute top-3.5 right-3 text-[#76ABAE] cursor-pointer hover:text-[#5b8d90]"
                     onClick={() => setVisible(true)}
                   />
                 )}
               </div>
             </div>
-            <div className={`${styles.noramlFlex} justify-between`}>
-              <div className={`${styles.noramlFlex}`}>
-                <input
-                  type="checkbox"
-                  name="remember-me"
-                  id="remember-me"
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+
+            {/* Remember Me & Forgot Password */}
+            <div className="flex justify-between items-center text-sm">
+              <label className="flex items-center gap-2 text-[#EEEEEE]">
+                <input 
+                  type="checkbox" 
+                  className="rounded border-[#76ABAE] text-[#76ABAE] focus:ring-[#76ABAE]"
                 />
-                <label
-                  htmlFor="remember-me"
-                  className="ml-2 block text-sm text-gray-900"
-                >
-                  Remember me
-                </label>
-              </div>
-              <div className="text-sm">
-                <a
-                  href=".forgot-password"
-                  className="font-medium text-blue-600 hover:text-blue-500"
-                >
-                  Forgot your password?
-                </a>
-              </div>
-            </div>
-            <div>
-              <button
-                type="submit"
-                className="group relative w-full h-[40px] flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-              >
-                Submit
-              </button>
-            </div>
-            <div className={`${styles.noramlFlex} w-full`}>
-              <h4>Not have any account?</h4>
-              <Link to="/signup" className="text-blue-600 pl-2">
-                Sign Up
+                Remember me
+              </label>
+              <Link to="/forgot-password" className="text-[#76ABAE] hover:text-[#5b8d90] hover:underline">
+                Forgot Password?
               </Link>
-              </div>
-          </form>
-        </div>
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-[#76ABAE] hover:bg-[#5b8d90] text-white font-semibold py-3 px-8 rounded-xl shadow-md transition-all text-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {isLoading ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Signing In...
+                </>
+              ) : (
+                'Sign In'
+              )}
+            </button>
+
+            {/* Sign Up Link */}
+            <p className="text-sm text-center text-[#EEEEEE]">
+              Don't have an account?{" "}
+              <Link to="/signup" className="text-[#76ABAE] hover:text-[#5b8d90] hover:underline font-medium">
+                Sign up
+              </Link>
+            </p>
+          </div>
+        </form>
       </div>
     </div>
+  );
+};
 
-  )
-}
-
-export default Login
+export default Login;

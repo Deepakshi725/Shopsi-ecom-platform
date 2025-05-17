@@ -25,31 +25,26 @@ router.post("/create-user", upload.single("file"), catchAsyncErrors(async (req, 
 
     const userEmail = await User.findOne({ email });
     if (userEmail) {
-        // if (req.file) {
+        if (req.file) {
             const filepath = path.join(__dirname, "../uploads", req.file.filename);
-        //     try {
-        //         fs.unlinkSync(filepath);
-        //     } catch (err) {
-        //         console.log("Error removing file:", err);
-        //         return res.status(500).json({ message: "Error removing file" });
-        //     }
-        // }
-
-        if (fs.existsSync(filepath)) {
-            try {
-                fs.unlinkSync(filepath);
-            } catch (err) {
-                console.log("Error removing file:", err);
-                return res.status(500).json({ message: "Error removing file" });
+            if (fs.existsSync(filepath)) {
+                try {
+                    fs.unlinkSync(filepath);
+                } catch (err) {
+                    console.log("Error removing file:", err);
+                    return res.status(500).json({ message: "Error removing file" });
+                }
             }
         }
         return next(new ErrorHandler("User already exists", 400));
     }
 
-    let fileUrl = "";
-    if (req.file) {
-        fileUrl = path.join("uploads", req.file.filename);
-    }
+    // Set avatar information
+    const avatar = {
+        public_id: req.file ? req.file.filename : "default-avatar",
+        url: req.file ? path.join("uploads", req.file.filename) : "uploads/default-avatar.png"
+    };
+
     const hashedPassword = await bcrypt.hash(password, 10);
     console.log("At Create ", "Password: ", password, "Hash: ", hashedPassword);
 
@@ -57,10 +52,7 @@ router.post("/create-user", upload.single("file"), catchAsyncErrors(async (req, 
         name,
         email,
         password,
-        avatar: {
-            public_id: req.file?.filename || "",
-            url: fileUrl,
-        },
+        avatar
     }); 
     console.log(user);
     res.status(201).json({ success: true, user });
@@ -123,7 +115,7 @@ router.post("/login-user", catchAsyncErrors(async (req, res, next) => {
 }));
 
 // 3) Get profile
-router.get("/profile",isAuthenticatedUser, catchAsyncErrors(async (req, res, next) => {
+router.get("/profile", isAuthenticatedUser, catchAsyncErrors(async (req, res, next) => {
     const { email } = req.query;
     if (!email) {
         return next(new ErrorHandler("Please provide an email", 400));
@@ -138,7 +130,7 @@ router.get("/profile",isAuthenticatedUser, catchAsyncErrors(async (req, res, nex
             name: user.name,
             email: user.email,
             phoneNumber: user.phoneNumber,
-            avatarUrl: user.avatar.url
+            avatarUrl: user.avatar.url.replace(/\\/g, '/')
         },
         addresses: user.addresses,
     });
@@ -160,7 +152,7 @@ router.post("/add-address",isAuthenticatedUser, catchAsyncErrors(async (req, res
         address1,
         address2,
         zipCode,
-        addressType,
+        addressType
     };
 
     user.addresses.push(newAddress);
@@ -189,7 +181,63 @@ router.get("/addresses",isAuthenticatedUser, catchAsyncErrors(async (req, res, n
 }
 ));
 
+// 6) Update profile
+router.put("/update-profile", isAuthenticatedUser, upload.single("file"), catchAsyncErrors(async (req, res, next) => {
+    const { email } = req.query;
+    if (!email) {
+        return next(new ErrorHandler("Please provide an email", 400));
+    }
 
+    const user = await User.findOne({ email });
+    if (!user) {
+        return next(new ErrorHandler("User not found", 404));
+    }
 
+    // Update basic info
+    if (req.body.name) user.name = req.body.name;
+    if (req.body.phoneNumber) user.phoneNumber = req.body.phoneNumber;
+
+    // Handle avatar update
+    if (req.file) {
+        console.log("File received:", req.file);
+        
+        // Delete old avatar if exists
+        if (user.avatar?.url) {
+            const oldAvatarPath = path.join(__dirname, '..', user.avatar.url);
+            console.log("Old avatar path:", oldAvatarPath);
+            if (fs.existsSync(oldAvatarPath)) {
+                fs.unlinkSync(oldAvatarPath);
+            }
+        }
+
+        // Update with new avatar - ensure forward slashes in URL
+        const fileUrl = path.join("uploads", req.file.filename).replace(/\\/g, '/');
+        console.log("New file URL:", fileUrl);
+        
+        user.avatar = {
+            public_id: req.file.filename,
+            url: fileUrl.startsWith('/') ? fileUrl.slice(1) : fileUrl
+        };
+        console.log("Updated avatar object:", user.avatar);
+    } else if (!user.avatar || !user.avatar.url) {
+        // Set default avatar if none exists
+        user.avatar = {
+            public_id: "default-avatar",
+            url: "uploads/default-avatar.png"
+        };
+    }
+
+    await user.save();
+
+    res.status(200).json({
+        success: true,
+        user: {
+            name: user.name,
+            email: user.email,
+            phoneNumber: user.phoneNumber,
+            avatarUrl: user.avatar.url.replace(/\\/g, '/')
+        }
+    });
+}));
 
 module.exports = router;

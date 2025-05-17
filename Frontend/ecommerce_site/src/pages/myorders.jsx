@@ -3,21 +3,48 @@ import React, { useState, useEffect, useCallback } from 'react';
 import axios from '../axiosConfig';
 import Nav from '../components/nav'
 import { useSelector } from 'react-redux'; // Import useSelector
+import { FaBox, FaTruck, FaCheckCircle, FaTimesCircle, FaSpinner, FaCalendarAlt, FaMapMarkerAlt, FaShoppingBag, FaMoneyBillWave } from 'react-icons/fa';
+import { server } from '../server';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const MyOrdersPage = () => {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [filter, setFilter] = useState('all'); // 'all', 'processing', 'shipped', 'delivered', 'cancelled'
 
-        // Retrieve email from Redux state
-        const email = useSelector((state) => state.user.email);
+    // Retrieve email from Redux state
+    const email = useSelector((state) => state.user.email);
 
-        const fetchOrders = useCallback(async () => {
-        if (!email) return; // Only fetch if email is available
+    const getStatusColor = (status) => {
+        switch (status?.toLowerCase()) {
+            case 'processing':
+                return 'text-blue-500';
+            case 'cancelled':
+                return 'text-red-500';
+            default:
+                return 'text-gray-500';
+        }
+    };
+
+    const getStatusIcon = (status) => {
+        switch (status?.toLowerCase()) {
+            case 'processing':
+                return <FaSpinner className="animate-spin" />;
+            case 'cancelled':
+                return <FaTimesCircle />;
+            default:
+                return <FaBox />;
+        }
+    };
+
+    const fetchOrders = useCallback(async () => {
+        if (!email) return;
         try {
             setLoading(true);
             setError('');
-            const response = await axios.get('/api/v2/orders/my-orders', {
+            const response = await axios.get(`${server}/orders/my-orders`, {
                 params: { email },
             });
             setOrders(response.data.orders);
@@ -26,24 +53,71 @@ const MyOrdersPage = () => {
         } finally {
             setLoading(false);
         }
-    }, [email]); // Dependency array includes email
+    }, [email]);
 
     // Cancel order handler
     const cancelOrder = async (orderId) => {
+        if (!window.confirm('Are you sure you want to cancel this order?')) {
+            return;
+        }
 
         try {
-            const response = await axios.patch(`http://localhost:8000/api/v2/orders/cancel-order/${orderId}`);
-            // Update the order in local state: either remove or update its status.
-            setOrders((prevOrders) =>
-                prevOrders.map((order) =>
-                    order._id === orderId ? { ...order, status: response.data.order.status } : order
-                )
-            );
-                                // Refetch updated orders
-                                await fetchOrders();
+            const response = await axios.patch(`${server}/orders/cancel-order/${orderId}`);
+            
+            if (response.data.message === 'Order cancelled successfully.') {
+                // Show success toast
+                toast.success(
+                    <div className="flex flex-col">
+                        <span className="font-semibold">Order Cancelled Successfully!</span>
+                        <span className="text-sm opacity-90">
+                            Order #{orderId.slice(-6).toUpperCase()} has been cancelled.
+                        </span>
+                    </div>,
+                    {
+                        position: "top-right",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        style: {
+                            background: '#31363F',
+                            color: '#EEEEEE',
+                            borderLeft: '4px solid #76ABAE'
+                        }
+                    }
+                );
+
+                // Update the order in local state
+                setOrders((prevOrders) =>
+                    prevOrders.map((order) =>
+                        order._id === orderId ? { ...order, orderStatus: 'Cancelled' } : order
+                    )
+                );
+
+                // Refetch orders to ensure we have the latest data
+                await fetchOrders();
+            }
         } catch (err) {
-            console.error(err);
-            alert(err.response?.data?.message || 'Error cancelling order');
+            console.error('Error cancelling order:', err);
+            toast.error(
+                err.response?.data?.message || 'Failed to cancel order. Please try again.',
+                {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    style: {
+                        background: '#31363F',
+                        color: '#EEEEEE',
+                        borderLeft: '4px solid #ff4444'
+                    }
+                }
+            );
         }
     };
 
@@ -51,85 +125,154 @@ const MyOrdersPage = () => {
         fetchOrders();
     }, [fetchOrders]); // Dependency array includes email
 
+    const filteredOrders = orders.filter(order => {
+        if (filter === 'all') return true;
+        return order.orderStatus?.toLowerCase() === filter.toLowerCase();
+    });
+
     return (
         <>
             <Nav />
-            <div className="min-h-screen bg-gray-100 py-10">
-                <div className="max-w-4xl mx-auto px-4">
-                    <h1 className="text-4xl font-extrabold text-center mb-10">My Orders</h1>
+            <ToastContainer />
+            <div className="min-h-screen bg-[#222831] py-10">
+                <div className="max-w-6xl mx-auto px-4">
+                    <h1 className="text-4xl font-extrabold text-center mb-10 text-[#EEEEEE]">My Orders</h1>
+
+                    {/* Filter Buttons */}
+                    <div className="flex justify-center gap-4 mb-8">
+                        {['all', 'processing', 'cancelled'].map((status) => (
+                            <button
+                                key={status}
+                                onClick={() => setFilter(status)}
+                                className={`px-4 py-2 rounded-lg transition-all ${
+                                    filter === status
+                                        ? 'bg-[#76ABAE] text-white'
+                                        : 'bg-[#31363F] text-[#EEEEEE] hover:bg-[#76ABAE]/50'
+                                }`}
+                            >
+                                {status.charAt(0).toUpperCase() + status.slice(1)}
+                            </button>
+                        ))}
+                    </div>
 
                     {loading && (
-                        <p className="text-center text-blue-500 text-lg">Loading orders...</p>
-                    )}
-                    {error && (
-                        <p className="text-center text-red-500 text-lg">{error}</p>
+                        <div className="flex justify-center items-center py-10">
+                            <FaSpinner className="animate-spin text-[#76ABAE] text-4xl" />
+                        </div>
                     )}
 
-                    {orders.length > 0 ? (
+                    {error && (
+                        <div className="bg-red-500/10 border border-red-500 text-red-500 px-4 py-3 rounded-lg text-center">
+                            {error}
+                        </div>
+                    )}
+
+                    {filteredOrders.length > 0 ? (
                         <div className="grid gap-8">
-                            {orders.map((order) => (
+                            {filteredOrders.map((order) => (
                                 <div
                                     key={order._id}
-                                    className="bg-white rounded-lg shadow-lg p-6 transition transform hover:scale-105"
+                                    className="bg-[#31363F] rounded-xl shadow-lg p-6 transition-all hover:shadow-[#76ABAE]/20 border border-[#76ABAE]/50"
                                 >
-                                    <div className="flex justify-between items-center border-b pb-3 mb-4">
-                                        <p className="text-lg font-semibold">
-                                            Order ID: <span className="font-light text-sm">{order._id}</span>
-                                        </p>
-                                        <p className="text-2xl font-bold text-green-600">
-                                            ${order.totalAmount}
-                                        </p>
-                                    </div>
-
-                                    <div className="mb-4">
-                                        <h2 className="text-xl font-semibold mb-2">Shipping Address</h2>
-                                        <div className="text-gray-700 ml-4 space-y-1">
-                                            <p>
-                                                {order.shippingAddress.address1}
-                                                {order.shippingAddress.address2 &&
-                                                    `, ${order.shippingAddress.address2}`}
-                                            </p>
-                                            <p>
-                                                {order.shippingAddress.city}, {order.shippingAddress.zipCode}
-                                            </p>
-                                            <p>{order.shippingAddress.country}</p>
-                                            <p className="italic">
-                                                {order.shippingAddress.addressType}
+                                    {/* Order Header */}
+                                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-[#76ABAE]/50 pb-4 mb-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className={`text-2xl ${getStatusColor(order.orderStatus)}`}>
+                                                {getStatusIcon(order.orderStatus)}
+                                            </div>
+                                            <div>
+                                                <p className="text-[#EEEEEE] font-medium">
+                                                    Order #{order._id.slice(-6).toUpperCase()}
+                                                </p>
+                                                <p className="text-sm text-[#76ABAE]">
+                                                    <FaCalendarAlt className="inline mr-2" />
+                                                    {new Date(order.createdAt).toLocaleDateString()}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div className="mt-2 sm:mt-0">
+                                            <p className="text-2xl font-bold text-[#76ABAE]">
+                                                ${order.totalAmount.toFixed(2)}
                                             </p>
                                         </div>
                                     </div>
 
-                                    <div className="mb-4">
-                                        <h2 className="text-xl font-semibold mb-2">Items</h2>
-                                        <ul className="list-disc ml-8 space-y-1 text-gray-700">
-                                            {order.orderItems.map((item, index) => (
-                                                <li key={index}>
-                                                    {item.name} - Qty: {item.quantity} - ${item.price}
-                                                </li>
-                                            ))}
-                                        </ul>
+                                    {/* Order Details */}
+                                    <div className="grid md:grid-cols-2 gap-6">
+                                        {/* Shipping Address */}
+                                        <div className="bg-[#222831] rounded-lg p-4">
+                                            <h2 className="text-lg font-semibold text-[#EEEEEE] mb-3 flex items-center gap-2">
+                                                <FaMapMarkerAlt className="text-[#76ABAE]" />
+                                                Shipping Address
+                                            </h2>
+                                            <div className="text-[#EEEEEE] space-y-1">
+                                                <p>{order.shippingAddress.address1}</p>
+                                                {order.shippingAddress.address2 && (
+                                                    <p>{order.shippingAddress.address2}</p>
+                                                )}
+                                                <p>{order.shippingAddress.city}, {order.shippingAddress.zipCode}</p>
+                                                <p>{order.shippingAddress.country}</p>
+                                                <p className="text-[#76ABAE] text-sm">
+                                                    {order.shippingAddress.addressType}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        {/* Order Items */}
+                                        <div className="bg-[#222831] rounded-lg p-4">
+                                            <h2 className="text-lg font-semibold text-[#EEEEEE] mb-3 flex items-center gap-2">
+                                                <FaShoppingBag className="text-[#76ABAE]" />
+                                                Order Items
+                                            </h2>
+                                            <div className="space-y-2">
+                                                {order.orderItems.map((item, index) => (
+                                                    <div
+                                                        key={index}
+                                                        className="flex justify-between items-center text-[#EEEEEE] border-b border-[#76ABAE]/20 pb-2 last:border-0"
+                                                    >
+                                                        <div>
+                                                            <p className="font-medium">{item.name}</p>
+                                                            <p className="text-sm text-[#76ABAE]">
+                                                                Quantity: {item.quantity}
+                                                            </p>
+                                                        </div>
+                                                        <p className="text-[#76ABAE]">
+                                                            ${(item.price * item.quantity).toFixed(2)}
+                                                        </p>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
                                     </div>
 
-                                    {/* Cancel button (hide if already cancelled) */}
-                                    {order.orderStatus !== 'Cancelled' && (
-                                        <button
-                                            onClick={() => cancelOrder(order._id)}
-                                            className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded"
-                                        >
-                                            Cancel Order
-                                        </button>
-                                    )}
-                                    {order.orderStatus === 'Cancelled' && (
-                                        <p className="text-red-600 font-semibold">Order Cancelled</p>
-                                    )}
+                                    {/* Order Actions */}
+                                    <div className="mt-6 flex justify-between items-center">
+                                        <div className="flex items-center gap-2 text-[#EEEEEE]">
+                                            <FaMoneyBillWave className="text-[#76ABAE]" />
+                                            <span>Payment Status: {order.paymentStatus}</span>
+                                        </div>
+                                        {order.orderStatus !== 'Cancelled' && (
+                                            <button
+                                                onClick={() => cancelOrder(order._id)}
+                                                className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition-all"
+                                            >
+                                                Cancel Order
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
                             ))}
                         </div>
                     ) : (
                         !loading && (
-                            <p className="text-center text-gray-500 mt-10 text-lg">
-                                No orders found.
-                            </p>
+                            <div className="text-center py-20">
+                                <FaBox className="text-[#76ABAE] text-6xl mx-auto mb-4" />
+                                <p className="text-[#EEEEEE] text-xl">
+                                    {filter === 'all'
+                                        ? 'No orders found.'
+                                        : `No ${filter} orders found.`}
+                                </p>
+                            </div>
                         )
                     )}
                 </div>

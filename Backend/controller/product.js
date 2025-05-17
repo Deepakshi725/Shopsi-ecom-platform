@@ -146,11 +146,17 @@ router.put('/update-product/:id',isAuthenticatedUser, pupload.array('images', 10
         }
 
         let updatedImages = existingProduct.images;
-        if (req.files || req.files.length > 0) {
-            updatedImages = req.files.map((file) => {
-                return `/products/${path.basename(file.path)}`;
-            });
+        // if (req.files || req.files.length > 0) {
+        //     updatedImages = req.files.map((file) => {
+        //         return `/products/${path.basename(file.path)}`;
+        //     });
+        // }
+
+        if (req.files && req.files.length > 0) {
+            const newImages = req.files.map((file) => `/products/${path.basename(file.path)}`);
+            updatedImages = [...existingProduct.images, ...newImages]; // appending new images
         }
+        
 
         const validationErrors = validateProductData({
             name,
@@ -315,6 +321,35 @@ router.put('/cartproduct/quantity',isAuthenticatedUser, async (req, res) => {
 
         res.status(200).json({
             message: 'Cart product quantity updated successfully',
+            cart: user.cart
+        });
+    } catch (err) {
+        console.error('Server error:', err);
+        res.status(500).json({ error: 'Server Error' });
+    }
+});
+
+// 10) Delete item from cart
+router.delete('/cartproduct/:email/:productId', isAuthenticatedUser, async (req, res) => {
+    const { email, productId } = req.params;
+    console.log("Deleting cart product");
+
+    if (!email || !productId) {
+        return res.status(400).json({ error: 'Email and productId are required' });
+    }
+
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Remove the item from the cart array
+        user.cart = user.cart.filter(item => item.productId.toString() !== productId);
+        await user.save();
+
+        res.status(200).json({
+            message: 'Product removed from cart successfully',
             cart: user.cart
         });
     } catch (err) {

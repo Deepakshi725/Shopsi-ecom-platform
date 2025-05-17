@@ -1,72 +1,93 @@
-import PropTypes from "prop-types"; // Import PropTypes
+import PropTypes from "prop-types";
+import { FaHome, FaBriefcase, FaBuilding, FaMapMarkerAlt, FaTrash } from 'react-icons/fa';
+import axios from '../axiosConfig';
+import { useState } from 'react';
+import { server } from '../server';
 
-export default function Product({
+export default function AddressCard({
+	_id,
 	country,
 	city,
 	address1,
 	address2,
 	zipCode,
 	addressType,
+	email,
+	onDelete
 }) {
+	const [isDeleting, setIsDeleting] = useState(false);
+
+	const getAddressTypeIcon = (type) => {
+		switch (type?.toLowerCase()) {
+			case 'home':
+				return <FaHome className="text-[#76ABAE]" />;
+			case 'work':
+				return <FaBriefcase className="text-[#76ABAE]" />;
+			default:
+				return <FaBuilding className="text-[#76ABAE]" />;
+		}
+	};
+
+	const handleDelete = async () => {
+		if (!window.confirm('Are you sure you want to delete this address?')) {
+			return;
+		}
+
+		setIsDeleting(true);
+		try {
+			await axios.delete(`${server}/user/delete-address/${_id}`, {
+				params: { email }
+			});
+			if (onDelete) {
+				onDelete(_id);
+			}
+		} catch (error) {
+			console.error('Error deleting address:', error);
+			alert('Failed to delete address. Please try again.');
+		} finally {
+			setIsDeleting(false);
+		}
+	};
+
 	return (
-		<div className="w-full h-max bg-transparent p-5 rounded-lg border border-neutral-600 grid grid-cols-12 gap-5">
-			<div className="col-span-12 sm:col-span-6 md:col-span-4 lg:col-span-3 xl:col-span-2">
-				<div className="w-full h-max bg-neutral-700 rounded-lg flex flex-col gap-y-2">
-					<div className="w-full h-max break-all text-xl text-neutral-200">
-						Country
+		<div className="bg-[#31363F] rounded-xl shadow-lg overflow-hidden border border-[#76ABAE]/50 hover:border-[#76ABAE] transition-all">
+			{/* Header */}
+			<div className="p-4 border-b border-[#76ABAE]/50 bg-[#222831]">
+				<div className="flex items-center justify-between">
+					<div className="flex items-center gap-2">
+						{getAddressTypeIcon(addressType)}
+						<span className="text-[#EEEEEE] font-medium">
+							{addressType || 'Other'}
+						</span>
 					</div>
-					<div className="w-full h-max break-all text-lg font-light text-neutral-200">
-						{country}
-					</div>
-				</div>
-			</div>
-			<div className="col-span-12 sm:col-span-6 md:col-span-4 lg:col-span-3 xl:col-span-2">
-				<div className="w-full h-max bg-neutral-700 rounded-lg flex flex-col gap-y-2">
-					<div className="w-full h-max break-all text-xl text-neutral-200">
-						City
-					</div>
-					<div className="w-full h-max break-all text-lg font-light text-neutral-200">
-						{city}
-					</div>
-				</div>
-			</div>
-			<div className="col-span-12 sm:col-span-6 md:col-span-4 lg:col-span-3 xl:col-span-2">
-				<div className="w-full h-max bg-neutral-700 rounded-lg flex flex-col gap-y-2">
-					<div className="w-full h-max break-all text-xl text-neutral-200">
-						Address 1
-					</div>
-					<div className="w-full h-max break-all text-lg font-light text-neutral-200">
-						{address1}
+					<div className="flex items-center gap-2">
+						<button
+							onClick={handleDelete}
+							disabled={isDeleting}
+							className="text-[#EEEEEE] hover:text-red-500 transition-colors p-2"
+							title="Delete Address"
+						>
+							<FaTrash size={16} />
+						</button>
 					</div>
 				</div>
 			</div>
-			<div className="col-span-12 sm:col-span-6 md:col-span-4 lg:col-span-3 xl:col-span-2">
-				<div className="w-full h-max bg-neutral-700 rounded-lg flex flex-col gap-y-2">
-					<div className="w-full h-max break-all text-xl text-neutral-200">
-						Address 2
-					</div>
-					<div className="w-full h-max break-all text-lg font-light text-neutral-200">
-						{address2}
-					</div>
-				</div>
-			</div>
-			<div className="col-span-12 sm:col-span-6 md:col-span-4 lg:col-span-3 xl:col-span-2">
-				<div className="w-full h-max bg-neutral-700 rounded-lg flex flex-col gap-y-2">
-					<div className="w-full h-max break-all text-xl text-neutral-200">
-						Zip Code
-					</div>
-					<div className="w-full h-max break-all text-lg font-light text-neutral-200">
-						{zipCode}
-					</div>
-				</div>
-			</div>
-			<div className="col-span-12 sm:col-span-6 md:col-span-4 lg:col-span-3 xl:col-span-2">
-				<div className="w-full h-max bg-neutral-700 rounded-lg flex flex-col gap-y-2">
-					<div className="w-full h-max break-all text-xl text-neutral-200">
-						Address Type
-					</div>
-					<div className="w-full h-max break-all text-lg font-light text-neutral-200">
-						{addressType}
+
+			{/* Address Details */}
+			<div className="p-4">
+				<div className="space-y-3">
+					<div className="flex items-start gap-2">
+						<FaMapMarkerAlt className="text-[#76ABAE] mt-1" />
+						<div>
+							<p className="text-[#EEEEEE]">
+								{address1}
+								{address2 && `, ${address2}`}
+							</p>
+							<p className="text-[#EEEEEE]">
+								{city}, {country}
+							</p>
+							<p className="text-[#EEEEEE]">{zipCode}</p>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -74,14 +95,21 @@ export default function Product({
 	);
 }
 
-Product.propTypes = {
-  _id:PropTypes.string.isRequired,
-  country: PropTypes.string.isRequired, 
-  city: PropTypes.string.isRequired, 
-  address1: PropTypes.string.isRequired, 
-  address2: PropTypes.number.isRequired, 
-  zipCode: PropTypes.number.isRequired,
-  addressType: PropTypes.number.isRequired,
+AddressCard.propTypes = {
+	_id: PropTypes.string.isRequired,
+	country: PropTypes.string.isRequired,
+	city: PropTypes.string.isRequired,
+	address1: PropTypes.string.isRequired,
+	address2: PropTypes.string,
+	zipCode: PropTypes.string.isRequired,
+	addressType: PropTypes.string.isRequired,
+	email: PropTypes.string.isRequired,
+	onDelete: PropTypes.func
+};
+
+AddressCard.defaultProps = {
+	address2: '',
+	onDelete: null
 };
 
 

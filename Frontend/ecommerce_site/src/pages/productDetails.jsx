@@ -1,35 +1,35 @@
 //eslint-disable-next-line
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from '../axiosConfig';
 import Nav from "../components/nav";
-import { IoIosAdd } from "react-icons/io";
-import { IoIosRemove } from "react-icons/io";
-import { useSelector } from "react-redux"; // Import useSelector
-
+import { IoIosAdd, IoIosRemove } from "react-icons/io";
+import { useSelector } from "react-redux";
+import { FaShoppingCart, FaSpinner, FaExclamationCircle, FaTag, FaLayerGroup, FaInfoCircle, FaMoneyBillWave } from 'react-icons/fa';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { server } from "../server";
 
 export default function ProductDetails() {
 	const { id } = useParams();
+	const navigate = useNavigate();
 	const [product, setProduct] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
-	const [quantity, setQuantity] = useState(1); // 1. Initialize quantity state
-
-		// Get email from Redux state
+	const [quantity, setQuantity] = useState(1);
+	const [selectedImage, setSelectedImage] = useState(0);
+	const [addingToCart, setAddingToCart] = useState(false);
 	const email = useSelector((state) => state.user.email);
 
 	useEffect(() => {
 		const fetchProduct = async () => {
 			try {
-				const response = await axios.get(
-					`/api/v2/product/product/${id}`
-				);
-				console.log("Fetched product:", response.data.product);
-				setProduct(response.data.product); // Ensure correct state setting
-				setLoading(false);
+				const response = await axios.get(`${server}/product/product/${id}`);
+				setProduct(response.data.product);
 			} catch (err) {
 				console.error("Error fetching product:", err);
-				setError(err);
+				setError(err.response?.data?.message || 'Failed to fetch product details');
+			} finally {
 				setLoading(false);
 			}
 		};
@@ -37,74 +37,130 @@ export default function ProductDetails() {
 		fetchProduct();
 	}, [id]);
 
-	// Log the updated product state whenever it changes
-	useEffect(() => {
-		if (product !== null) {
-			console.log("Updated product state:", product);
-			console.log("Product name:", product.name);
-		}
-	}, [product]);
-
-	// 2. Handler to increment quantity
 	const handleIncrement = () => {
 		setQuantity((prevQuantity) => prevQuantity + 1);
 	};
 
-	// 3. Handler to decrement quantity, ensuring it doesn't go below 1
 	const handleDecrement = () => {
 		setQuantity((prevQuantity) => (prevQuantity > 1 ? prevQuantity - 1 : 1));
 	};
 
-	const addtocart = async () => {
+	const addToCart = async () => {
+		if (!email) {
+			toast.error('Please login to add items to cart');
+			navigate('/');
+			return;
+		}
+
+		setAddingToCart(true);
 		try {
-			const response = await axios.post("/api/v2/product/cart",
+			const response = await axios.post(`${server}/product/cart`, {
+				userId: email,
+				productId: id,
+				quantity: quantity,
+			});
+			
+			// Check if the response indicates an update or new addition
+			const isUpdate = response.data.message?.includes('updated') || response.data.message?.includes('Updated');
+			
+			// Enhanced success toast with different messages for update vs new addition
+			toast.success(
+				<div className="flex flex-col">
+					<span className="font-semibold">
+						{isUpdate ? 'Cart Updated Successfully!' : 'Added to Cart Successfully!'}
+					</span>
+					<span className="text-sm opacity-90">
+						{quantity} {quantity === 1 ? 'item' : 'items'} of {product.name}
+					</span>
+				</div>,
 				{
-					userId: email,
-					productId: id,
-					quantity: quantity,
+					position: "top-right",
+					autoClose: 3000,
+					hideProgressBar: false,
+					closeOnClick: true,
+					pauseOnHover: true,
+					draggable: true,
+					progress: undefined,
+					style: {
+						background: '#31363F',
+						color: '#EEEEEE',
+						borderLeft: '4px solid #76ABAE'
+					}
 				}
 			);
-			console.log("Added to cart:", response.data);
+			
+			console.log("Cart operation:", response.data);
 		} catch (err) {
-			console.error("Error adding to cart:", err);
+			console.error("Error with cart operation:", err);
+			toast.error(
+				err.response?.data?.message || 'Failed to update cart',
+				{
+					position: "top-right",
+					autoClose: 3000,
+					hideProgressBar: false,
+					closeOnClick: true,
+					pauseOnHover: true,
+					draggable: true,
+					progress: undefined,
+					style: {
+						background: '#31363F',
+						color: '#EEEEEE',
+						borderLeft: '4px solid #ff4444'
+					}
+				}
+			);
+		} finally {
+			setAddingToCart(false);
 		}
 	};
 
-
 	if (loading) {
 		return (
-			<div className="flex justify-center items-center h-screen">
-				<div className="text-xl">Loading...</div>
+			<div className="min-h-screen bg-[#222831] flex justify-center items-center">
+				<div className="text-center">
+					<FaSpinner className="animate-spin text-[#76ABAE] text-4xl mx-auto mb-4" />
+					<p className="text-[#EEEEEE] text-lg">Loading product details...</p>
+				</div>
 			</div>
 		);
 	}
 
 	if (error) {
 		return (
-			<div className="flex justify-center items-center h-screen">
-				<div className="text-red-500 text-xl">
-					Error: {error.message}
-				</div>
+			<div className="min-h-screen bg-[#222831] flex flex-col justify-center items-center p-4">
+				<FaExclamationCircle className="text-red-500 text-5xl mb-4" />
+				<p className="text-red-500 text-lg mb-4 text-center">{error}</p>
+				<button
+					onClick={() => window.location.reload()}
+					className="bg-[#76ABAE] hover:bg-[#5b8d90] text-white px-6 py-2 rounded-lg transition-all"
+				>
+					Retry
+				</button>
 			</div>
 		);
 	}
 
 	if (!product) {
 		return (
-			<div className="flex justify-center items-center h-screen">
-				<div className="text-gray-500 text-xl">No product found.</div>
+			<div className="min-h-screen bg-[#222831] flex justify-center items-center">
+				<div className="text-center">
+					<FaExclamationCircle className="text-[#76ABAE] text-5xl mx-auto mb-4" />
+					<p className="text-[#EEEEEE] text-xl">No product found</p>
+				</div>
 			</div>
 		);
 	}
 
 	return (
-		<>
+		<div className="min-h-screen bg-[#222831]">
+			<ToastContainer />
 			<Nav />
-			<div className="container mx-auto p-6">
-				<div className="bg-white drop-shadow-lg rounded-lg overflow-hidden">
-					<div className="md:flex select-none">
+			<div className="max-w-7xl mx-auto px-4 py-8">
+				<div className="bg-[#31363F] rounded-xl shadow-lg overflow-hidden border border-[#76ABAE]/50">
+					<div className="md:flex">
 						{/* Image Section */}
-						<div className="w-full bsm:w-2/3 md:w-1/3 rounded-lg">
+						<div className="md:w-1/2 p-6">
+							<div className="relative">
 							{product.images && product.images.length > 0 ? (
 								<img
 									src={`http://localhost:8000${product.images[0]}`}
@@ -112,105 +168,115 @@ export default function ProductDetails() {
 									className="w-full h-full object-contain bsm:object-cover"
 									style={{ maxHeight: "500px" }} // Adjust the max height as needed
 								/>
-							) : (
-								<div className="w-full h-64 bg-gray-200 flex items-center justify-center">
-									No Image Available
-								</div>
-							)}
+
+								) : (
+									<div className="w-full h-[400px] bg-[#222831] rounded-lg flex items-center justify-center text-[#EEEEEE]">
+										No Image Available
+									</div>
+								)}
+							</div>
 						</div>
 
 						{/* Information Section */}
 						<div className="md:w-1/2 p-6">
-							<h1 className="text-3xl font-semibold mb-4 text-gray-800">
+							<h1 className="text-3xl font-bold mb-4 text-[#EEEEEE]">
 								{product.name}
 							</h1>
 
-							<div className="mb-4">
-								<h2 className="text-xl font-medium text-gray-700">
-									Description
-								</h2>
-								<p className="text-gray-600 mt-2">
+							<div className="mb-6">
+								<div className="flex items-center gap-2 mb-2">
+									<FaLayerGroup className="text-[#76ABAE]" />
+									<h2 className="text-xl font-semibold text-[#EEEEEE]">Category</h2>
+								</div>
+								<p className="text-[#76ABAE]">{product.category}</p>
+							</div>
+
+							{product.tags && product.tags.length > 0 && (
+								<div className="mb-6">
+									<div className="flex items-center gap-2 mb-2">
+										<FaTag className="text-[#76ABAE]" />
+										<h2 className="text-xl font-semibold text-[#EEEEEE]">Tags</h2>
+									</div>
+									<div className="flex flex-wrap gap-2">
+										{product.tags.map((tag, index) => (
+											<span
+												key={index}
+												className="bg-[#76ABAE]/10 text-[#76ABAE] px-3 py-1 rounded-full text-sm"
+											>
+												{tag}
+											</span>
+										))}
+									</div>
+								</div>
+							)}
+
+							<div className="mb-6">
+								<div className="flex items-center gap-2 mb-2">
+									<FaInfoCircle className="text-[#76ABAE]" />
+									<h2 className="text-xl font-semibold text-[#EEEEEE]">Description</h2>
+								</div>
+								<p className="text-[#EEEEEE] leading-relaxed">
 									{product.description}
 								</p>
 							</div>
 
-							<div className="flex flex-wrap gap-x-5 my-2">
-								<div>
-									<h2 className="text-xl font-medium text-gray-700">
-										Category
-									</h2>
-									<p className="text-gray-600 mt-2">
-										{product.category}
-									</p>
+							<div className="mb-6">
+								<div className="flex items-center gap-2 mb-2">
+									<FaMoneyBillWave className="text-[#76ABAE]" />
+									<h2 className="text-xl font-semibold text-[#EEEEEE]">Price</h2>
 								</div>
-
-								{product.tags && product.tags.length > 0 && (
-									<div>
-										<h2 className="text-xl font-medium text-gray-700">
-											Tags
-										</h2>
-										<div className="mt-2 flex flex-wrap">
-											{product.tags.map((tag, index) => (
-												<span
-													key={index}
-													className="bg-blue-100 text-blue-800 text-sm font-medium mr-2 mb-2 px-3 py-1 rounded-full"
-												>
-													{tag}
-												</span>
-											))}
-										</div>
-									</div>
-								)}
+								<p className="text-2xl font-bold text-[#76ABAE]">
+									${product.price.toFixed(2)}
+								</p>
 							</div>
 
-							<div className="flex flex-wrap gap-x-5 mt-3 mb-5 items-start">
-								<div className="flex flex-col gap-y-3">
-									<h2 className="text-xl font-medium text-gray-700">
-										Price
-									</h2>
-									<p className="text-gray-600 text-lg font-semibold">
-										${product.price}
-									</p>
+							<div className="mb-6">
+								<div className="flex items-center gap-2 mb-2">
+									<FaShoppingCart className="text-[#76ABAE]" />
+									<h2 className="text-xl font-semibold text-[#EEEEEE]">Quantity</h2>
 								</div>
-								{/* 4. Update Quantity Section */}
-								<div className="flex flex-col gap-y-3">
-									<div className="text-xl font-medium text-gray-700">
-										Quantity
-									</div>
-									<div className="flex flex-row items-center gap-x-2">
-										{/* 5. Attach onClick to Increment Button */}
-										<div
-											onClick={handleIncrement}
-											className="flex justify-center items-center bg-gray-200 hover:bg-gray-300 active:translate-y-1 p-2 rounded-xl cursor-pointer"
-										>
-											<IoIosAdd />
-										</div>
-										{/* 6. Display Current Quantity */}
-										<div className="px-5 py-1 text-center bg-gray-100 rounded-xl pointer-events-none">
-											{quantity}
-										</div>
-										{/* 7. Attach onClick to Decrement Button */}
-										<div
+								<div className="flex items-center gap-4">
+									<div className="flex items-center gap-2">
+										<button
 											onClick={handleDecrement}
-											className="flex justify-center items-center bg-gray-200 hover:bg-gray-300 active:translate-y-1 p-2 rounded-xl cursor-pointer"
+											className="w-10 h-10 flex items-center justify-center bg-[#222831] text-[#EEEEEE] rounded-lg hover:bg-[#76ABAE] transition-all"
 										>
 											<IoIosRemove />
-										</div>
+										</button>
+										<span className="w-12 text-center text-[#EEEEEE] text-lg">
+											{quantity}
+										</span>
+										<button
+											onClick={handleIncrement}
+											className="w-10 h-10 flex items-center justify-center bg-[#222831] text-[#EEEEEE] rounded-lg hover:bg-[#76ABAE] transition-all"
+										>
+											<IoIosAdd />
+										</button>
 									</div>
 								</div>
 							</div>
 
-							<div className="flex flex-wrap gap-x-5 my-3">
-								<button className="bg-black text-white px-5 py-2 rounded-full hover:bg-neutral-800 hover:-translate-y-1.5 active:translate-y-0 
-								transition-transform duration-200 ease-in-out active:duration-0 active:ease-linear" onClick={addtocart}>
-									Add to Cart
-								</button>
-							</div>
-
+							<button
+								onClick={addToCart}
+								disabled={addingToCart}
+								className="w-full bg-[#76ABAE] hover:bg-[#5b8d90] text-white font-semibold py-3 px-6 rounded-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+							>
+								{addingToCart ? (
+									<>
+										<FaSpinner className="animate-spin" />
+										Adding to Cart...
+									</>
+								) : (
+									<>
+										<FaShoppingCart />
+										Add to Cart
+									</>
+								)}
+							</button>
 						</div>
 					</div>
 				</div>
 			</div>
-		</>
+		</div>
 	);
 }

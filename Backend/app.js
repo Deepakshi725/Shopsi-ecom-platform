@@ -4,9 +4,20 @@ const cors = require('cors');
 const ErrorHandler = require('./middleware/error');
 const path = require('path');
 const cookieParser = require("cookie-parser");
-
+const fs = require('fs');
 
 const app = express();
+
+// Create upload directories if they don't exist
+const uploadsDir = path.join(__dirname, 'uploads');
+const productsDir = path.join(__dirname, 'products');
+
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+}
+if (!fs.existsSync(productsDir)) {
+    fs.mkdirSync(productsDir, { recursive: true });
+}
 
 // Built-in middleware for parsing JSON
 app.use(express.json()); 
@@ -15,13 +26,15 @@ app.use(cookieParser());
 
 app.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));
 
-
 // Configure CORS to allow requests from React frontend
 app.use(cors({
     origin: 'http://localhost:5173', // Update this if your frontend is hosted elsewhere
     credentials: true, // Enable if you need to send cookies or authentication headers
-  }));
+}));
 
+// Serve static files BEFORE route handling
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/products', express.static(path.join(__dirname, 'products')));
 
 // Import Routes
 const user = require('./controller/user');
@@ -29,14 +42,14 @@ const product = require('./controller/product');
 const orders = require('./controller/order');
 
 // Route Handling
-app.use("/api/v2/user",user);
+app.use("/api/v2/user", user);
 app.use("/api/v2/product", product);
-app.use("/api/v2/orders", orders); // In milestone_26
+app.use("/api/v2/orders", orders);
 
-
-// Serve static files for uploads and products
-app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); // In milestone_26
-app.use('/products' ,express.static(path.join(__dirname, 'products')));
+// Add a route to check if the server is running
+app.get('/api/v2/health', (req, res) => {
+    res.status(200).json({ status: 'ok' });
+});
 
 // Error Handling Middleware
 app.use(ErrorHandler);
