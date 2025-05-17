@@ -23,9 +23,15 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post(`${server}/user/login-user`, {
+      const response = await axios.post(`${server}/api/v2/user/login-user`, {
         email,
         password
+      }, {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
       });
 
       if (response.data.success) {
@@ -40,7 +46,7 @@ const Login = () => {
       }
     } catch (error) {
       console.error('Login error:', error);
-      toast.error(error.response?.data?.message || 'Login failed');
+      toast.error(error.response?.data?.message || 'Login failed. Please check your credentials.');
     } finally {
       setIsLoading(false);
     }
