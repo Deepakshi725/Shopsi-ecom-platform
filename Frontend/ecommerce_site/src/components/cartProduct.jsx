@@ -121,7 +121,7 @@ export default function CartProduct({ _id, name, images = [], quantity = 1, pric
 				<div className="w-full md:w-48 h-48 flex-shrink-0">
 					{images && images.length > 0 ? (
 						<img
-							src={`http://localhost:8000${images[currentIndex]}`}
+							src={`${server}${images[currentIndex]}`}
 							alt={name || 'Product image'}
 							className="w-full h-full object-cover rounded-lg"
 							onError={(e) => {

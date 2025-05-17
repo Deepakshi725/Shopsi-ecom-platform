@@ -44,7 +44,7 @@ export default function Profile() {
 					const cleanUrl = data.user.avatarUrl.replace(/\\/g, '/');
 					const avatarUrl = cleanUrl.startsWith('http') 
 						? cleanUrl 
-						: `http://localhost:8000/${cleanUrl.startsWith('/') ? cleanUrl.slice(1) : cleanUrl}`;
+						: `${server}${cleanUrl.startsWith('/') ? cleanUrl.slice(1) : cleanUrl}`;
 					console.log("Constructed avatar URL:", avatarUrl);
 					setPreviewUrl(avatarUrl);
 				} else {
@@ -109,7 +109,7 @@ export default function Profile() {
 				const cleanUrl = updatedUser.avatarUrl.replace(/\\/g, '/');
 				const newAvatarUrl = cleanUrl.startsWith('http')
 					? cleanUrl
-					: `http://localhost:8000/${cleanUrl.startsWith('/') ? cleanUrl.slice(1) : cleanUrl}`;
+					: `${server}${cleanUrl.startsWith('/') ? cleanUrl.slice(1) : cleanUrl}`;
 				console.log("New avatar URL:", newAvatarUrl);
 				setPreviewUrl(newAvatarUrl);
 				setIsEditing(false);

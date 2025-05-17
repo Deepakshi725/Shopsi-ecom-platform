@@ -25,7 +25,7 @@ export default function Product({ _id, name, images, description, price }) {
       <div className="w-full">
         {currentImage && (
           <img
-            src={`http://localhost:8000${currentImage}`}
+            src={`${server}${currentImage}`}
             alt={name}
             className="w-full h-56 object-cover rounded-md mb-3 border-2 border-[#222831]"
           />

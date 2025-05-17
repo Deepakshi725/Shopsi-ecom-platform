@@ -25,7 +25,7 @@ export default function Myproduct({ _id, name, images, description, price }) {
     const handleDelete = async () => {
         try {
             const response = await axios.delete(
-                `http://localhost:8000/api/v2/product/delete-product/${_id}`
+                `${server}/api/v2/product/delete-product/${_id}`
             );
             if (response.status === 200) {
                 alert("Product deleted successfully!");
@@ -44,7 +44,7 @@ export default function Myproduct({ _id, name, images, description, price }) {
             <div className="w-full">
                 {currentImage && (
                     <img
-                        src={`http://localhost:8000${currentImage}`}
+                        src={`${server}${currentImage}`}
                         alt={name}
                         className="w-full h-56 object-cover rounded-md mb-3 border-2 border-[#222831]"
                     />
